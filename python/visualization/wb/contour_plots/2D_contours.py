@@ -37,7 +37,7 @@ DATA_TYPE = 'turbidity'          # Set to 'chlor_a' for Chlorophyll a data or 't
 TURBIDITY_CONTOUR_LEVEL = 5.0  # Threshold for turbidity concentration to overlay contour lines
 CHLOROPHYLL_CONTOUR_LEVEL = 1.0  # Threshold for Chlorophyll a concentration to overlay contour lines
 
-BASE_DIR = '/Users/macbook/thesis_materials'
+BASE_DIR = '/Users/macbook/HawkEye_Evaluation'
 DATA_DIR = os.path.join(BASE_DIR, 'data/acrobat/050523/transects/processed_transects')
 
 # Dynamically set the SAVE_DIR based on the DATA_TYPE and INTERPOLATION_METHOD

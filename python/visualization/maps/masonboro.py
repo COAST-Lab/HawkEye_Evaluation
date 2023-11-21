@@ -17,31 +17,26 @@ import matplotlib.ticker as mticker
 # -----------------
 # CONSTANTS
 # -----------------
-FILE_LIST = [
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_1.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_2.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_3.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_4.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_5.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_6.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_7.xlsx'
-]
-SAVE_DIR = "/Users/macbook/thesis_materials/visualization/maps/masonboro"
+SELECTED_DATA_TYPE = 'chlor_a'  # Change this to 'chlor_a' as needed
 
-SATELLITE_IMAGES_DIR = "/Users/macbook/thesis_materials/data/satellite_matchups_mod/locations/masonboro/products/chlor/crops"
-SATELLITE_NAMES = ["HawkEye", "MODIS", "S3A", "S3B"]
-SATELLITE_IMG_FILES = ["SEAHAWK1_HAWKEYE.2023050720230507.chlor_a-mean_crop.png", "AQUA_MODIS.2023050720230507.chlor_a-mean_crop.png", "S3A_OLCI_EFRNT.2023050720230507.chlor_a-mean_crop.png", "S3B_OLCI_EFR.2023050620230506.chlor_a-mean_crop.png"]
+BASE_DIR = '/Users/macbook/HawkEye_Evaluation'
+TRANSECT_DIR = os.path.join(BASE_DIR, 'data/acrobat/050523/transects/processed_transects')
+FILE_LIST = [os.path.join(TRANSECT_DIR, f) for f in os.listdir(TRANSECT_DIR) if f.endswith('.xlsx')]
+SATELLITE_IMAGES_DIR = os.path.join(BASE_DIR, f'data/satellite_matchups/locations/masonboro/_products/{SELECTED_DATA_TYPE}/crops')
+SATELLITE_IMG_FILES = sorted([f for f in os.listdir(SATELLITE_IMAGES_DIR) if f.endswith('.png')])
+SATELLITE_NAMES = ["MODIS", "S3A", "S3B", "HawkEye"]  # Ensure this list is in the same order as SATELLITE_IMG_FILES
 PIXEL_RESOLUTIONS_METERS = [120, 1000, 300, 3]
 SAT_IMG_BOUNDS = [34.1, 34.24, -77.85, -77.70]  # [min_lat, max_lat, min_lon, max_lon]
+COMPASS_ROSE_PATH = os.path.join(BASE_DIR, 'python/helper_data/compass_rose.png')
+SAVE_DIR = os.path.join(BASE_DIR, f'visualization/maps/masonboro/{SELECTED_DATA_TYPE}')
 
+# Ensure SUBPLOT_TITLES align with SATELLITE_NAMES and SATELLITE_IMG_FILES
 SUBPLOT_TITLES = [
-    "RV Cape Fear, Masonboro Inlet - HawkEye (120m) from May 07, 2023",
     "RV Cape Fear, Masonboro Inlet - MODIS (1000m) from May 07, 2023",
     "RV Cape Fear, Masonboro Inlet - S3A (300m) from May 07, 2023",
-    "RV Cape Fear, Masonboro Inlet - S3B (300m) from May 06, 2023"
+    "RV Cape Fear, Masonboro Inlet - S3B (300m) from May 06, 2023",
+    "RV Cape Fear, Masonboro Inlet - HawkEye (120m) from May 07, 2023"
 ]
-
-COMPASS_ROSE_PATH = '/Users/macbook/thesis_materials/python/helper_data/compass_rose.png'
 
 # -----------------
 # HELPER FUNCTIONS
@@ -93,42 +88,26 @@ def main():
     if not os.path.exists(SAVE_DIR):
         os.makedirs(SAVE_DIR)
 
-    # Create a mosaic figure with subplots for each satellite image
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16, 16), subplot_kw={'projection': ccrs.PlateCarree()}, dpi=150)  # Adjust nrows and ncols based on the number of images
-    axes = axes.flatten()
-
-    # Adjust spacing between subplots
-    plt.subplots_adjust(wspace=0.1, hspace=0.1)
-
-    for i, (satellite_name, img_file, pixel_resolution_meters) in enumerate(zip(SATELLITE_NAMES, SATELLITE_IMG_FILES, PIXEL_RESOLUTIONS_METERS)):
-        ax = axes[i]
+    # Create and save individual plots
+    for i, img_file in enumerate(SATELLITE_IMG_FILES):
+        fig, ax = plt.subplots(figsize=(8, 8), subplot_kw={'projection': ccrs.PlateCarree()}, dpi=150)
         
-        pixel_resolution_degrees = meters_to_degrees(pixel_resolution_meters, 34.1)
-
+        satellite_name = SATELLITE_NAMES[i]
+        subplot_title = SUBPLOT_TITLES[i]
         satellite_img_path = os.path.join(SATELLITE_IMAGES_DIR, img_file)
 
-        # Set the extent of the map to the bounds of the satellite image
+        pixel_resolution_degrees = meters_to_degrees(PIXEL_RESOLUTIONS_METERS[i], 34.1)
         min_lat, max_lat, min_lon, max_lon = SAT_IMG_BOUNDS
         ax.set_extent([min_lon, max_lon, min_lat, max_lat], crs=ccrs.PlateCarree())
 
-        # Read and display the satellite image
         satellite_img = mpimg.imread(satellite_img_path)
-
-        # Check if the image size is too large
-        if satellite_img.shape[0] > 65536 or satellite_img.shape[1] > 65536:
-            print(f"Warning: Image '{img_file}' is too large and may not display correctly.")
-            continue
-
         ax.imshow(satellite_img, extent=[min_lon, max_lon, min_lat, max_lat], transform=ccrs.PlateCarree(), origin='upper', aspect='auto')
 
         plot_transects(ax, dfs, colors)
-
         legend_handles = [Line2D([0], [0], color=colors[i], lw=2, label=f"Transect {i+1}") for i in range(n_colors)]
         ax.legend(handles=legend_handles, loc='upper right', title='Transect')
 
-        # Set the title for each subplot from the SUBPLOT_TITLES list
-        if i < len(SUBPLOT_TITLES):
-            ax.set_title(SUBPLOT_TITLES[i])
+        ax.set_title(subplot_title)
 
         compass_rose_image = mpimg.imread(COMPASS_ROSE_PATH)
         compass_size = 0.02
@@ -138,7 +117,6 @@ def main():
         scale_bar_position = (compass_position[1] - 0.005, compass_position[0])
         draw_scale_bar(ax, scale_bar_position, length_km=2)
 
-        # Set latitude and longitude tick marks
         ax.set_xticks([min_lon, max_lon], crs=ccrs.PlateCarree())
         ax.set_yticks([min_lat, max_lat], crs=ccrs.PlateCarree())
         lon_formatter = cticker.LongitudeFormatter()
@@ -148,14 +126,41 @@ def main():
         ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins=5, prune='both'))
         ax.yaxis.set_major_locator(mticker.MaxNLocator(nbins=5, prune='both'))
 
-    # Adjust the spacing between columns
-    plt.subplots_adjust(wspace=0.15)
+        individual_plot_save_path = os.path.join(SAVE_DIR, f"{satellite_name}_map.png")
+        plt.savefig(individual_plot_save_path, dpi=300, bbox_inches='tight')
+        plt.close(fig)
 
-    # Adjust save path for the mosaic
+    # Create a mosaic figure with subplots for each satellite image
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16, 16), subplot_kw={'projection': ccrs.PlateCarree()}, dpi=150)
+    axes = axes.flatten()
+
+    for i, img_file in enumerate(SATELLITE_IMG_FILES):
+        ax = axes[i]
+        satellite_name = SATELLITE_NAMES[i]
+        subplot_title = SUBPLOT_TITLES[i]
+        satellite_img_path = os.path.join(SATELLITE_IMAGES_DIR, img_file)
+
+        ax.set_extent([min_lon, max_lon, min_lat, max_lat], crs=ccrs.PlateCarree())
+        satellite_img = mpimg.imread(satellite_img_path)
+        ax.imshow(satellite_img, extent=[min_lon, max_lon, min_lat, max_lat], transform=ccrs.PlateCarree(), origin='upper', aspect='auto')
+
+        plot_transects(ax, dfs, colors)
+        ax.legend(handles=legend_handles, loc='upper right', title='Transect')
+        ax.set_title(subplot_title)
+
+        ax.imshow(compass_rose_image, extent=[compass_position[0], compass_position[0] + compass_size, compass_position[1], compass_position[1] + compass_size], transform=ccrs.PlateCarree(), origin='upper')
+        draw_scale_bar(ax, scale_bar_position, length_km=2)
+
+        ax.set_xticks([min_lon, max_lon], crs=ccrs.PlateCarree())
+        ax.set_yticks([min_lat, max_lat], crs=ccrs.PlateCarree())
+        ax.xaxis.set_major_formatter(lon_formatter)
+        ax.yaxis.set_major_formatter(lat_formatter)
+        ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins=5, prune='both'))
+        ax.yaxis.set_major_locator(mticker.MaxNLocator(nbins=5, prune='both'))
+
+    plt.subplots_adjust(wspace=0.15, hspace=0.1)
     mosaic_save_path = os.path.join(SAVE_DIR, "mosaic_map.png")
     plt.savefig(mosaic_save_path, dpi=300, bbox_inches='tight')
-
-    # Close the mosaic figure
     plt.close(fig)
 
 # -----------------

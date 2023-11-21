@@ -27,17 +27,10 @@ import seaborn as sns
 # -----------------
 # CONSTANTS
 # -----------------
-FILE_LIST = [
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_1.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_2.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_3.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_4.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_5.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_6.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_7.xlsx'
-]
-SAVE_DIR = "/Users/macbook/thesis_materials/visualization/maps/transects_wb.png"
-COMPASS_ROSE_PATH = '/Users/macbook/thesis_materials/python/helper_images/compass_rose.png'
+BASE_DIR = '/Users/macbook/HawkEye_Evaluation'
+TRANSECT_DIR = os.path.join(BASE_DIR, 'data/acrobat/050523/transects/processed_transects')
+SAVE_DIR = os.path.join(BASE_DIR, 'visualization/maps/transects_wb.png')
+COMPASS_ROSE_PATH = os.path.join(BASE_DIR, 'python/helper_data/compass_rose.png')
 
 
 # -----------------
@@ -88,10 +81,10 @@ def draw_scale_bar(ax, location, length_km, color='black'):
 # MAIN FUNCTION
 # -----------------
 def main():
-    n_colors = len(FILE_LIST)
+    n_colors = len(TRANSECT_DIR)
     colors = sns.color_palette("dark", n_colors=n_colors)
 
-    dfs, combined_dfs = load_transect_data(FILE_LIST)
+    dfs, combined_dfs = load_transect_data(TRANSECT_DIR)
     min_lon, max_lon, min_lat, max_lat = calculate_bounds(combined_dfs)
 
     print(f"Encompassing square coordinates: \nTop-Left: ({min_lon}, {max_lat}), \nTop-Right: ({max_lon}, {max_lat}), \nBottom-Left: ({min_lon}, {min_lat}), \nBottom-Right: ({max_lon}, {min_lat})")

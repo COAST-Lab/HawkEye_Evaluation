@@ -27,7 +27,7 @@ from PIL import Image
 # CONSTANTS
 # -----------------
 EARTH_RADIUS = 6371  # in kilometers
-BASE_DIR = '/Users/macbook/thesis_materials'
+BASE_DIR = '/Users/macbook/HawkEye_Evaluation'
 DATA_DIR = os.path.join(BASE_DIR, 'data/acrobat/050523/transects/processed_transects')
 SAVE_DIR = os.path.join(BASE_DIR, 'visualization/contour_plots/wb/turbidity/3D_plots/individual_transects')
 SHORE_POINT = (-77.802938, 34.195220)

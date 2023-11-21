@@ -4,8 +4,8 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
 # Constants and configurations
-DATA_DIR = '/Users/macbook/thesis_materials/data/acrobat/050523/transects'
-SAVE_DIR = '/Users/macbook/thesis_materials/data/acrobat/050523/transects/processed_transects'
+DATA_DIR = '/Users/macbook/HawkEye_Evaluation/data/acrobat/050523/transects'
+SAVE_DIR = '/Users/macbook/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects'
 
 QC_PARAMS = {
     'time_increment': pd.Timedelta(minutes=15),
