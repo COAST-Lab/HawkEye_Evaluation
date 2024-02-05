@@ -25,19 +25,42 @@ import cmocean
 import rasterio
 from geopy.distance import great_circle
 from tqdm import tqdm
+from matplotlib.ticker import FormatStrFormatter
 
+
+# -----------------
+# ADJUSTABLE FEATURES
+# -----------------
+INTERPOLATION_METHOD = 'linear'     # options are linear, cubic, or nearest.
+DATA_TYPE = 'chlor_a'              # options are temp, salinity, density, turbidity, cdom, chlor_a, ox_sat.
+
+SHOW_TRANSECT_TITLE = True          # Set to False to hide transect titles.
+SHOW_AXES_TITLES = True             # Set to False to hide axes titles.
+SHOW_COLORBAR = True                # Set to False to hide the colorbar.
+ENABLE_CONTOUR_OVERLAY = False      # Set to False to disable contour overlay.
+CONTOUR_LEVELS = {
+    'temp': [20, 25],
+    'salinity': [35],
+    'density': [1025],
+    'turbidity': [5.0],
+    'chlor_a': [1.0]
+}
+ENABLE_INTERPOLATION = True         # Set to False to disable data interpolation.
+ENABLE_BATHYMETRY = True            # Set to Flase to disable bathymetry data.
+
+# Set default font sizes for all plots
+plt.rcParams['font.size'] = 12  # Main font size
+plt.rcParams['axes.labelsize'] = 18  # Axes label size
+plt.rcParams['axes.titlesize'] = 20  # Figure title size
+plt.rcParams['xtick.labelsize'] = 16  # X-tick label size
+plt.rcParams['ytick.labelsize'] = 16  # Y-tick label size
+plt.rcParams['figure.dpi'] = 500  # Figure resolution
 
 # -----------------
 # CONSTANTS
 # -----------------
-ENABLE_INTERPOLATION = True   # Set to False to disable chlorophyll data interpolation
-INTERPOLATION_METHOD = 'linear'   # options are linear, cubic, or nearest
-ENABLE_BATHYMETRY = True       # Set to True to include bathymetry data, False to exclude it
-DATA_TYPE = 'turbidity'          # Set to 'chlor_a' for Chlorophyll a data or 'turbidity' for turbidity data
-TURBIDITY_CONTOUR_LEVEL = 5.0  # Threshold for turbidity concentration to overlay contour lines
-CHLOROPHYLL_CONTOUR_LEVEL = 1.0  # Threshold for Chlorophyll a concentration to overlay contour lines
 
-BASE_DIR = '/Users/macbook/HawkEye_Evaluation'
+BASE_DIR = '/Users/mitchtork/HawkEye_Eval/'
 DATA_DIR = os.path.join(BASE_DIR, 'data/acrobat/050523/transects/processed_transects')
 
 # Dynamically set the SAVE_DIR based on the DATA_TYPE and INTERPOLATION_METHOD
@@ -46,11 +69,9 @@ if not ENABLE_INTERPOLATION:
     SAVE_DIR = os.path.join(BASE_DIR, f'visualization/contour_plots/wb/{DATA_TYPE}/2D_plots/contours')
 
 BATHYMETRY_PATH = os.path.join(BASE_DIR, 'python/helper_data/bathymetry/gebco_2023_n34.5_s33.75_w-78.0_e-77.3.tif')
+
 NUM_CONTOUR_LEVELS = 100  # Number of contour levels in the plot
 EARTH_RADIUS = 6371  # in kilometers
-SHOW_TRANSECT_TITLE = False   # Set to False to hide transect titles
-SHOW_AXES_TITLES = False       # Set to False to hide axes titles
-SHOW_COLORBAR = True          # Set to False to hide the colorbar
 
 # -----------------
 # HELPER FUNCTIONS
@@ -87,11 +108,34 @@ def load_bathymetry(file_path):
     return bathymetry_data, transform
 
 def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, global_max, include_bathymetry):
+    # Base plot dimensions
+    base_plot_width = 10  # base width in inches
+    base_plot_height = 10  # base height in inches
+
+    # Adjust width based on additional features
+    extra_width = 0
+    if SHOW_COLORBAR:
+        extra_width += 2  # Adding extra width for colorbar
+
+    # Adjust width for axes titles and figure title
+    if SHOW_AXES_TITLES or SHOW_TRANSECT_TITLE:
+        extra_width += 1  # Adding extra width for titles
+
+    # Set the figure size dynamically
+    fig_width = base_plot_width + extra_width
+    fig_height = base_plot_height  # Height remains constant
+
     # Plot the gradients for each transect based on DATA_TYPE
     max_distance = 0
     print(f"Generating {DATA_TYPE} gradient plots...")
     for idx, fname in enumerate(tqdm(file_names)):
         df = pd.read_excel(fname)
+        
+        # Add these lines to calculate and print local min and max for each transect
+        local_min = df[DATA_TYPE].min()
+        local_max = df[DATA_TYPE].max()
+        print(f"Transect {idx + 1} - Local {DATA_TYPE.capitalize()} Min: {local_min}, Local Max: {local_max}")
+       
         accumulated_distance = [0]
 
         # Calculate accumulated distances along the transect
@@ -107,16 +151,32 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
         max_distance = max(max_distance, accumulated_distance[-1])
         df['normalized_distance'] = accumulated_distance
 
-        # Define colormap and other variables outside the conditional branches
-        if DATA_TYPE == 'chlor_a':
-            colormap = cmocean.cm.algae
-            overlay_level = CHLOROPHYLL_CONTOUR_LEVEL
-            data_label = 'Chlorophyll (µg/L)'
+        # Dynamically define colormap and data label based on DATA_TYPE
+        if DATA_TYPE == 'temp':
+            colormap = cmocean.cm.thermal
+            data_label = 'Temperature (°C)'
+        elif DATA_TYPE == 'salinity':
+            colormap = cmocean.cm.haline
+            data_label = 'Salinity (PSU)'
+        elif DATA_TYPE == 'density':
+            colormap = cmocean.cm.dense
+            data_label = 'Density (kg/m³)'
         elif DATA_TYPE == 'turbidity':
             colormap = cmocean.cm.turbid
-            overlay_level = TURBIDITY_CONTOUR_LEVEL
             data_label = 'Turbidity (NTU)'
-
+        elif DATA_TYPE == 'cdom':
+            colormap = cmocean.cm.matter
+            data_label = 'CDOM'
+        elif DATA_TYPE == 'chlor_a':
+            colormap = cmocean.cm.algae
+            data_label = 'Chlorophyll a (µg/L)'
+        elif DATA_TYPE == 'ox_sat':
+            colormap = cmocean.cm.oxy
+            data_label = 'Oxygen Saturation (%)'
+        else:
+            colormap = cmocean.cm.haline  # Default colormap
+            data_label = f'{DATA_TYPE.capitalize()} value'
+            
         # Initialize max_depth based on the depth data
         max_depth = df['depth'].max()
 
@@ -128,7 +188,10 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
         yi = np.linspace(df['depth'].min(), df['depth'].max(), num_y_points)
         xi, yi = np.meshgrid(xi, yi)
 
-        fig, ax = plt.subplots(figsize=(10, 10))
+        # Calculate evenly spaced ticks for colorbar
+        colorbar_ticks = np.linspace(global_min, global_max, 11)
+
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 
         if ENABLE_INTERPOLATION:
             # Interpolation of the data
@@ -137,16 +200,26 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
             contour = ax.contourf(xi, yi, zi, NUM_CONTOUR_LEVELS, cmap=colormap, vmin=global_min, vmax=global_max)
 
             if SHOW_COLORBAR:
-                cbar = plt.colorbar(contour, ticks=np.linspace(0, 10, 11))
+                cbar = plt.colorbar(contour, ticks=colorbar_ticks)
                 cbar.set_label(data_label)
+                cbar.ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))  # Format colorbar labels to two decimal places
 
-            # Overlay contour lines based on the threshold level
-            CS = ax.contour(xi, yi, zi, levels=[overlay_level], colors='red', linewidths=1)
+            x_max = df['normalized_distance'].max()
+            ax.set_xticks(np.arange(0, x_max, 0.50))
+
+            if ENABLE_CONTOUR_OVERLAY:
+                # Check if the current data type has specified contour levels
+                contour_levels = CONTOUR_LEVELS.get(DATA_TYPE, None)
+                # Overlay contour lines if levels are specified
+                if contour_levels:
+                    CS = ax.contour(xi, yi, zi, levels=contour_levels, colors='red', linewidths=1)
         else:
             # Plot using scatter for non-interpolated data
-            scatter = ax.scatter(df['normalized_distance'], df['depth'], c=df[DATA_TYPE], cmap=colormap, s=5)
+            scatter = ax.scatter(df['normalized_distance'], df['depth'], c=df[DATA_TYPE], cmap=colormap, vmin=global_min, vmax=global_max, s=5)
             if SHOW_COLORBAR:
-                plt.colorbar(scatter, label=data_label)
+                cbar = plt.colorbar(scatter, ticks=colorbar_ticks, label=data_label)
+                cbar.ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))  # Optional: Format colorbar labels to two decimal places
+
 
         # Overlay a line representing the original data points
         ax.plot(df['normalized_distance'], df['depth'], color='black', linewidth=1, linestyle='dotted')
@@ -198,7 +271,8 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
         if SHOW_TRANSECT_TITLE:
             ax.set_title(f'{DATA_TYPE.capitalize()} gradient of transect {idx + 1}')
 
-        plt.savefig(f"{SAVE_DIR}/transect_{idx + 1}.png", dpi=300, bbox_inches='tight')
+        # Saving the figure with the specified DPI
+        plt.savefig(f"{SAVE_DIR}/transect_{idx + 1}.png", dpi=plt.rcParams['figure.dpi'], bbox_inches='tight')
         plt.close()
 # -----------------
 # SCRIPT EXECUTION
@@ -212,7 +286,7 @@ def main():
     print("Loading bathymetry data..." if ENABLE_BATHYMETRY else "Skipping bathymetry data...")
 
     global_min, global_max = get_global_min_max(file_names)
-    print(f"{DATA_TYPE.capitalize()} Global min: {global_min}, Global max: {global_max}")
+    print(f"Global {DATA_TYPE.capitalize()} Min: {global_min}, Global Max: {global_max}")
 
     plot_transect_gradients(file_names, bathymetry_data, transform, global_min, global_max, ENABLE_BATHYMETRY)
 

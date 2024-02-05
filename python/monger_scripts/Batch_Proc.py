@@ -31,20 +31,20 @@ Final_level = '3'
 #  -------------------------------------------------------------------------
 #  Location of the Level-1 Files:
 #  -------------------------------------------------------------------------
-l1a_dir = '/Users/mdt3971/data/satellite_matchups/hawkeye/l2'
+l1a_dir = '/Users/coastlab/data/satellite_matchups/landsat/l1a/LC08_L1TP_015036_20230503_20230509_02_T1'
 
 #  -------------------------------------------------------------------------
 #  Location where Level-2 Files will be written when processed from
 #  Level-1 to Level-2.  Or... Location where Level-2 Files were downloaded
 #  from Ocean Color Web
-#  -------------------------------------------------------------------------s
-l2_dir = '/Users/mdt3971/data/satellite_matchups/hawkeye/l2'
+#  -------------------------------------------------------------------------
+l2_dir = '/Users/coastlab/data/satellite_matchups/sensors/modisa/l2'
 
 #  -------------------------------------------------------------------------
 #  Location where Level-3 Files will be written when processed from
 #  Level-1 to Level-3 or Level-2 to Level-3.
 #  -------------------------------------------------------------------------
-binmap_dir ='/Users/mdt3971/data/satellite_matchups/hawkeye/l2-l3output250m'
+binmap_dir ='/Users/coastlab/data/satellite_matchups/sensors/modisa/l2-l3'
 
 #  -------------------------------------------------------------------------
 #  Setup Latitude and Longitude for Level-3 file generation
@@ -55,11 +55,13 @@ binmap_dir ='/Users/mdt3971/data/satellite_matchups/hawkeye/l2-l3output250m'
 #
 #  Crossing the Dateline:  Use only positive Longitude values of 0-360.
 #  -------------------------------------------------------------------------
-latlon = '30,-80,40,-70'                 # Lat/Lon Order is S,W,N,E   --Offshore Wilmington
+latlon = '34.10,-77.85,34.25,-77.70'     # Lat/Lon Order is S,W,N,E   --Masonboro Inlet
+#latlon = '33.75, -78.25, 34.5, -77.5'   # Lat/Lon Order is S,W,N,E   --Wilmington
+#latlon = '33,-79,36,-76'                # Lat/Lon Order is S,W,N,E   --Onslow Bay
 #latlon = '30,-78,54,-50'                # Lat/Lon Order is S,W,N,E   --Test for OCI L2
 #latlon = '-20.,176,-15,182'             # Lat/Lon Order is S,W,N,E   --Fiji
 #latlon = '18.,-158.5,22,-153.5'         # Lat/Lon Order is S,W,N,E   --Hawaii
-#latlon = '18.5,-156.5,20.,-155.5'       # Lat/Lon Order is S,W,N,E   --West Coast Big Island
+#latlon = '18.75,-155.75,19.75,-154.75'  # Lat/Lon Order is S,W,N,E   --Southeast Coast Big Island
 #############################################################################
 #  ------------>  Optional L1 -> L2 Processing Variables   <---------------
 #############################################################################
@@ -77,19 +79,19 @@ latlon = '30,-80,40,-70'                 # Lat/Lon Order is S,W,N,E   --Offshore
 # Options Are: prod_list_L12 = 'sst' or 'none' (future plans will allow sst4)
 # -----------------------------
 
-#prod_list_L12 =   'chlor_a,Rrs_nnn'
-prod_list_L12 =    'chlor_a'          # NOTE:      Comma separated (no spaces) list of products.
-                                      #
-                                      # PACE NOTE: Use Rrs_nnn to produce all Rrs
-                                      #            wavelengths.For hyperspectral PACE L1 data,
-                                      #            you will likey want to use Rrs_nnn to have 
-                                      #            all hyperspectral wavelengths
+prod_list_L12 =    'kd_490'
+#prod_list_L12 =    'chlor_a,Rrs_nnn,pic,poc,kd_490'  # NOTE: Comma separated (no spaces) list of products.
+                              #
+                              # PACE NOTE: Use Rrs_nnn to produce all Rrs
+                              #            wavelengths.For hyperspectral PACE L1 data,
+                              #            you will likey want to use Rrs_nnn to have all
+                              #            hyperspectral wavelengths
 
 prod_list_L12_sst= 'sst'      # Options are 'sst' or 'none'
 
 
 
-# NOTE: As of January 2022 viirsj1 sst data cannot be processed.
+# NOTE: As of January 2022 viirsj1 sst data cannot be proessed.
 # The Goddard folks explain that this is a personel issue and not a
 # technical issue.
 
@@ -135,10 +137,10 @@ swir_onoff = 'off'
 
 # Force Staraight Map (yes/no)???
 # ----------------------------------
-straight_map= 'no'  # NOTE:       Options are yes or no...
+straight_map= 'no'  # options are yes or no...
 
-                    # PACE NOTE:  At this point, the only option for PACE
-                    #             data is straight_map = 'no'.
+                    # PACE ONLY NOTE:  At this point, the only option for PACE
+                    #                  data is straight_map = 'no'.
 
 
 # If straight map set to no, then give l2bin size -Spatial Binning Resolution
@@ -148,21 +150,21 @@ straight_map= 'no'  # NOTE:       Options are yes or no...
 # '1'= 1.1km,          '2'= 2.3km,        '4'= 4.6km,     '9'= 9.2km,  '18'= 18.5km,  '36'= 36km
 # 'QD'= 0.25 degree,   'HD'= 0.5 degree,  '1D'= 1 degree
 #-------------------------------
-space_res = 'Q'
-#space_res = 'Q'
+#space_res = '1'
+space_res = '1'
 
 
 # l3bin -Temporal Binning (Averaging Period) daily, weekly, or monthly
 # Options Are: DLY, WKY, or MON
 # ------------------------------
-time_period = 'WKY'
+time_period = 'DLY'
 
 
 # Binning or Straight Mapping Statistics Output, on or off.
 # This tunes on file output of variance and numer of pixel in binning process
 # Default is no, options are 'yes' or  'no'
 # -----------------------------
-stats_yesno = 'no'
+stats_yesno = 'yes'
 
 
 # Quality Flags to be used for color products. #Default is 'standard' as set
@@ -171,15 +173,15 @@ stats_yesno = 'no'
 # Same thing goes sst products...
 #------------------------------
 
-# color_flags= 'standard'  # color_flags= 'ATMFAIL,LAND,HILT,HISATZEN,STRAYLIGHT,CLDICE,COCCOLITH,LOWLW,CHLWARN,CHLFAIL,NAVWARN,MAXAERITER,ATMWARN,HISOLZEN,NAVFAIL,FILTER,HIGLINT,ATMWARN,HISOLZEN'
+#color_flags= 'standard'  # color_flags= 'ATMFAIL,LAND,HILT,HISATZEN,STRAYLIGHT,CLDICE,COCCOLITH,LOWLW,CHLWARN,CHLFAIL,NAVWARN,MAXAERITER,ATMWARN,HISOLZEN,NAVFAIL,FILTER,HIGLINT,ATMWARN,HISOLZEN'
 
-color_flags= color_flags='ATMFAIL,LAND,HILT,HISATZEN,STRAYLIGHT,CLDICE,COCCOLITH,LOWLW,CHLWARN,CHLFAIL,NAVWARN'
+color_flags = 'ATMFAIL,LAND,HILT,HISATZEN,STRAYLIGHT,CLDICE,COCCOLITH,LOWLW,CHLWARN,CHLFAIL,NAVWARN'
 
 # HAWKEYE NOTE:   >>> It seems that if either MAXAERITER or ATMWARN are used, all chl values as flagged when doing straight map.
 #                     Consider using:  color_flags='ATMFAIL,LAND,HILT,HISATZEN,STRAYLIGHT,CLDICE,COCCOLITH,LOWLW,CHLWARN,CHLFAIL,NAVWARN'
 
 #color_flags= 'ATMFAIL,LAND,CLDICE,HILT'
-#color_flags= 'LAND'
+#color_flags= 'standard'
 
 sst_flags =  'standard'
 
@@ -191,12 +193,12 @@ sst_flags =  'standard'
 # prod_list_L23 ='chlor_a,pic,poc,cdom_index'
 # ----------------------------
 #prod_list_L23 = 'all'
-prod_list_L23 = 'chlor_a'
+prod_list_L23 = 'all'
                              # PACE NOTE: If you are processing Level-2 PACE data
                              #            that was either downloaed as Level-2 AOP files or
-                             #            processed here from L1 to L2 (with Rrd_nnn),then 
-                             #            you must use prod_list_L23 = 'all' to map all
-                             #            hyerspecteral wavelenghts.
+                             #            processed here from L1 to L2,then you must use
+                             #            prod_list_L23 = 'all' to map all hyerspecteral
+                             #            wavelenghts.
 
 
 # Projection for standard mapped image.

@@ -29,10 +29,10 @@ import seaborn as sns
 # CONSTANTS
 # -----------------
 FILE_LIST = [
-   '/Users/macbook/HawkEye_Evaluation/data/acrobat/050323/transects/transect_1.xlsx'
+   '/Users/macbook/thesis_materials/data/acrobat/050323/transects/transect_1.xlsx'
 ]
-SAVE_DIR = "/Users/macbook/HawkEye_Evaluation/visualization/maps/transects_cf.png"
-COMPASS_ROSE_PATH = '/Users/macbook/HawkEye_Evaluation/python/helper_images/compass_rose.png'
+SAVE_DIR = "/Users/macbook/thesis_materials/visualization/maps/transects_cf.png"
+COMPASS_ROSE_PATH = '/Users/macbook/thesis_materials/python/helper_images/compass_rose.png'
 
 
 # -----------------

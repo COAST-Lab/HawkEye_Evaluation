@@ -382,7 +382,7 @@ def oli_level12(file_name, prod_list, color_l2_file_fname,latlon):
 
     #ancillary list
     os.system('getanc -v ' + first_band)
-    #general_utilities.my_getanc(first_band)
+    general_utilities.my_getanc(first_band)
     fname_ancil_list = first_band.split('/')[-1] + '.anc'
 
     print('\n >=====> generating level-2 OC data from level-1 oli data using l2gen...')
@@ -765,7 +765,7 @@ def batch_proc_L12(l1a_dir, l2_dir, prod_list, prod_list_sst, swir_onoff, hires,
     # Landsat 8
     if 'OLI' in satellite_name:
         for i in range(0,len(fname_l1a)):
-            oli_level12(fname_l1a[i], prod_list, color_l2_file_fname[i])
+            oli_level12(fname_l1a[i], prod_list, color_l2_file_fname[i], latlon)
 
     # Sentinal-3 OLCI
     if 'OLCI' in satellite_name:
