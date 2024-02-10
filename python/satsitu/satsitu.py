@@ -1,9 +1,5 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import os
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
 from netCDF4 import Dataset
 from my_hdf_cdf_utilities import *
 from my_general_utilities import *
@@ -31,7 +27,7 @@ def calculate_indices(lat, lon, bounds, array_shape):
     icol = int((lon - bounds['west']) / lon_res)
     return irow, icol
 
-# Paths to the files
+# Paths to the in situ data
 acrobat_fname = '/Users/mitchtork/HawkEye_Eval/data/acrobat/050523/transects/processed_transects/processed_dataset.xlsx'
 output_acrobat_fname = '/Users/mitchtork/HawkEye_Eval/data/acrobat/050523/transects/processed_transects/satsitu.xlsx'
 
@@ -72,9 +68,5 @@ for i, row in df.iterrows():
 
 # Write the updated DataFrame to a new Excel file
 df.to_excel(output_acrobat_fname, index=False)
-
-# Extract latitudes and longitudes from the DataFrame
-latitudes = df['lat'].values
-longitudes = df['lon'].values
 
 
