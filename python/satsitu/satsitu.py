@@ -5,7 +5,6 @@ import os
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from netCDF4 import Dataset
-from scipy.stats import pearsonr
 from my_hdf_cdf_utilities import *
 from my_general_utilities import *
 
@@ -71,52 +70,11 @@ for i, row in df.iterrows():
         if 0 <= irow < chl_array.shape[0] and 0 <= icol < chl_array.shape[1]:
             df.at[i, sensor_name + ' Chl'] = chl_array[irow, icol]
 
-# Statistical Analysis
-in_situ_chlor_a_values = df['chlor_a'].values
-for sensor_name in satellite_files.keys():
-    satellite_data = df[sensor_name + ' Chl'].values
-    valid_mask = ~np.isnan(satellite_data) & ~np.isnan(in_situ_chlor_a_values)
-    correlation, _ = pearsonr(satellite_data[valid_mask], in_situ_chlor_a_values[valid_mask])
-    mean_abs_diff = np.mean(np.abs(satellite_data[valid_mask] - in_situ_chlor_a_values[valid_mask]))
-    print(f"Correlation Coefficient ({sensor_name} vs In-Situ): {correlation}")
-    print(f"Mean Absolute Difference ({sensor_name} vs In-Situ): {mean_abs_diff}")
-
 # Write the updated DataFrame to a new Excel file
 df.to_excel(output_acrobat_fname, index=False)
-
-# Function to plot comparison
-def plot_comparison(satellite_data, in_situ_data, title, bounds, latitudes, longitudes, save_path, sensor_name):
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
-
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6), subplot_kw={'projection': ccrs.PlateCarree()})
-
-    # Add coastlines using Cartopy
-    feature = cfeature.GSHHSFeature(scale='full', levels=[1], facecolor='gray', edgecolor='black')
-    ax1.add_feature(feature)
-    ax2.add_feature(feature)
-
-    im = ax1.imshow(satellite_data, extent=(bounds['west'], bounds['east'], bounds['south'], bounds['north']), interpolation='none', cmap='viridis', transform=ccrs.PlateCarree())
-    fig.colorbar(im, ax=ax1, label='Satellite Chlorophyll concentration')
-    ax1.set_title(title + ' - Satellite')
-
-    sc = ax2.scatter(longitudes, latitudes, c=in_situ_data, cmap='viridis', edgecolors='none', s=30, alpha=0.7, transform=ccrs.PlateCarree())
-    fig.colorbar(sc, ax=ax2, label='In-Situ Chlorophyll concentration')
-    ax2.set_title(title + ' - In-Situ')
-
-    file_name = os.path.join(save_path, sensor_name + '_comparison.png')
-    plt.savefig(file_name)
-    plt.close()
 
 # Extract latitudes and longitudes from the DataFrame
 latitudes = df['lat'].values
 longitudes = df['lon'].values
 
-# Paths for saving heat maps
-save_path = '/Users/mitchtork/HawkEye_Eval/visualization/maps/heat_maps'
 
-# Generate comparison plots for each satellite dataset
-plot_comparison(hawk_chl_array, in_situ_chlor_a_values, 'HawkEye Chlorophyll Comparison', bounds, latitudes, longitudes, save_path, 'HawkEye')
-plot_comparison(modisa_chl_array, in_situ_chlor_a_values, 'MODISA Chlorophyll Comparison', bounds, latitudes, longitudes, save_path, 'MODISA')
-plot_comparison(S3A_chl_array, in_situ_chlor_a_values, 'Sentinel-3A Chlorophyll Comparison', bounds, latitudes, longitudes, save_path, 'Sentinel3A')
-plot_comparison(S3B_chl_array, in_situ_chlor_a_values, 'Sentinel-3B Chlorophyll Comparison', bounds, latitudes, longitudes, save_path, 'Sentinel3B')

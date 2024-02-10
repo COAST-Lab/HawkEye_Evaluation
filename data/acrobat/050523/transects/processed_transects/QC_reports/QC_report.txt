@@ -1,0 +1,126 @@
+
+Transect ID: 1
+timing_gap_flags: 0
+total_points_removed: 0
+temp_range_flags: 0
+temp_spike_flags: 0
+conductivity_range_flags: 0
+conductivity_spike_flags: 0
+density_range_flags: 0
+density_spike_flags: 0
+salinity_range_flags: 0
+salinity_spike_flags: 0
+turbidity_range_flags: 0
+turbidity_spike_flags: 0
+chlor_a_range_flags: 0
+chlor_a_spike_flags: 0
+ox_sat_range_flags: 0
+ox_sat_spike_flags: 0
+
+Transect ID: 2
+timing_gap_flags: 0
+total_points_removed: 0
+temp_range_flags: 0
+temp_spike_flags: 0
+conductivity_range_flags: 0
+conductivity_spike_flags: 0
+density_range_flags: 0
+density_spike_flags: 0
+salinity_range_flags: 0
+salinity_spike_flags: 0
+turbidity_range_flags: 0
+turbidity_spike_flags: 0
+chlor_a_range_flags: 0
+chlor_a_spike_flags: 0
+ox_sat_range_flags: 0
+ox_sat_spike_flags: 0
+
+Transect ID: 3
+timing_gap_flags: 0
+total_points_removed: 7
+temp_range_flags: 0
+temp_spike_flags: 0
+conductivity_range_flags: 0
+conductivity_spike_flags: 0
+density_range_flags: 0
+density_spike_flags: 0
+salinity_range_flags: 0
+salinity_spike_flags: 0
+turbidity_range_flags: 0
+turbidity_spike_flags: 5
+chlor_a_range_flags: 0
+chlor_a_spike_flags: 2
+ox_sat_range_flags: 0
+ox_sat_spike_flags: 0
+
+Transect ID: 4
+timing_gap_flags: 0
+total_points_removed: 2
+temp_range_flags: 0
+temp_spike_flags: 0
+conductivity_range_flags: 0
+conductivity_spike_flags: 2
+density_range_flags: 0
+density_spike_flags: 2
+salinity_range_flags: 1
+salinity_spike_flags: 2
+turbidity_range_flags: 0
+turbidity_spike_flags: 0
+chlor_a_range_flags: 0
+chlor_a_spike_flags: 0
+ox_sat_range_flags: 1
+ox_sat_spike_flags: 2
+
+Transect ID: 5
+timing_gap_flags: 0
+total_points_removed: 0
+temp_range_flags: 0
+temp_spike_flags: 0
+conductivity_range_flags: 0
+conductivity_spike_flags: 0
+density_range_flags: 0
+density_spike_flags: 0
+salinity_range_flags: 0
+salinity_spike_flags: 0
+turbidity_range_flags: 0
+turbidity_spike_flags: 0
+chlor_a_range_flags: 0
+chlor_a_spike_flags: 0
+ox_sat_range_flags: 0
+ox_sat_spike_flags: 0
+
+Transect ID: 6
+timing_gap_flags: 0
+total_points_removed: 2775
+temp_range_flags: 0
+temp_spike_flags: 0
+conductivity_range_flags: 0
+conductivity_spike_flags: 0
+density_range_flags: 0
+density_spike_flags: 0
+salinity_range_flags: 0
+salinity_spike_flags: 0
+turbidity_range_flags: 2775
+turbidity_spike_flags: 27
+chlor_a_range_flags: 0
+chlor_a_spike_flags: 0
+ox_sat_range_flags: 0
+ox_sat_spike_flags: 0
+
+Transect ID: 7
+timing_gap_flags: 0
+total_points_removed: 2
+temp_range_flags: 0
+temp_spike_flags: 0
+conductivity_range_flags: 0
+conductivity_spike_flags: 0
+density_range_flags: 0
+density_spike_flags: 0
+salinity_range_flags: 0
+salinity_spike_flags: 0
+turbidity_range_flags: 0
+turbidity_spike_flags: 2
+chlor_a_range_flags: 0
+chlor_a_spike_flags: 0
+ox_sat_range_flags: 0
+ox_sat_spike_flags: 0
