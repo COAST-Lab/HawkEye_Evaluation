@@ -12,11 +12,12 @@ This project aims to evaluate the efficacy of the HawkEye satellite sensor in ca
 ## Methodology
 Field missions will gather in-situ data, utilizing instruments capable of vertical water column profiling. Satellite imagery from HawkEye, MODIS, OLCI, and OLI will be analyzed for overlapping temporal and spatial coverage with field data. The study emphasizes the integration atmospheric correction, bio-optics, pigment algorithms, and spatial heterogeneity analyses to evaluate satellite-derived measurements.
 
-![mosaic of satellite chlorophyll measurements](images/mosaic_map.png)
-![seven in situ transects](images/chlor_a_gradient.gif)
-
 ## Preliminary Results
 Initial findings highlight the potential of HawkEye in providing high-resolution OC imagery, promising improvements in spatial understanding of marine biogeochemical dynamics. Detailed comparisons of satellite and in-situ data will inform the accuracy of OC remote sensing in coastal waters.
+
+![mosaic of satellite chlorophyll measurements](images/mosaic_map.png)  
+  
+![seven in situ transects](images/chlor_a_gradient.gif)
 
 ## Future Work
 The project will continue with the analysis of collected data, matchup analysis, and the synthesis of findings. Results will be disseminated through academic publications, aiming to contribute valuable insights into OC remote sensing and its application in marine conservation.
