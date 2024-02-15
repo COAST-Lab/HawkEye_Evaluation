@@ -19,10 +19,10 @@ Initial findings highlight the potential of HawkEye in providing high-resolution
 The project will continue with the analysis of collected data, matchup analysis, and the synthesis of findings. Results will be disseminated through academic publications, aiming to contribute valuable insights into OC remote sensing and its application in marine conservation.
 
 ## Contact
-Mitchell D. Torkelson
-University of North Carolina Wilmington
-Center for Marine Science
-E: mdt3971@uncw.edu
+Mitchell D. Torkelson    
+University of North Carolina Wilmington    
+Center for Marine Science   
+E: mdt3971@uncw.edu  
 
 ## Acknowledgements
 Thanks to the advisory committee and all who have supported this research.
