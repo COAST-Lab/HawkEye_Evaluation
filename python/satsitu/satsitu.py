@@ -28,10 +28,10 @@ output_acrobat_fname = '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/
 
 # Satellite data files
 satellite_files = {
-    'HawkEye': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/hawkeye/daily/chlor_a/mean/SEAHAWK1_HAWKEYE.2023050720230507.chlor_a-mean.smi.nc',
-    'MODISA': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/modisa/daily/chlor_a/mean/AQUA_MODIS.2023050720230507.chlor_a-mean.smi.nc',
-    'Sentinel3A': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/s3a/daily/chlor_a/mean/S3A_OLCI_EFRNT.2023050720230507.chlor_a-mean.smi.nc',
-    'Sentinel3B': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/s3b/daily/chlor_a/mean/S3B_OLCI_EFR.2023050620230506.chlor_a-mean.smi.nc'
+    'hawkeye': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/hawkeye/daily/chlor_a/mean/SEAHAWK1_HAWKEYE.2023050720230507.chlor_a-mean.smi.nc',
+    'modisa': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/modisa/daily/chlor_a/mean/AQUA_MODIS.2023050720230507.chlor_a-mean.smi.nc',
+    's3a': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/s3a/daily/chlor_a/mean/S3A_OLCI_EFRNT.2023050720230507.chlor_a-mean.smi.nc',
+    's3b': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/s3b/daily/chlor_a/mean/S3B_OLCI_EFR.2023050620230506.chlor_a-mean.smi.nc'
 }
 
 # Read in the Excel file of Acrobat data
@@ -58,10 +58,10 @@ for i, row in df.iterrows():
         irow, icol = calculate_indices(lat, lon, chl_array.shape)
         # Ensure indices are within the bounds of the chlorophyll data array
         if 0 <= irow < chl_array.shape[0] and 0 <= icol < chl_array.shape[1]:
-            df.at[i, sensor_name + ' Chl'] = chl_array[irow, icol]
+            df.at[i, sensor_name + '_chl'] = chl_array[irow, icol]
         else:
             # Handle cases where calculated indices are outside the array bounds
-            df.at[i, sensor_name + ' Chl'] = np.nan
+            df.at[i, sensor_name + '_chl'] = np.nan
 
 # Write the updated DataFrame to a new Excel file
 df.to_excel(output_acrobat_fname, index=False)
