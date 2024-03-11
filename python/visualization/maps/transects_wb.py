@@ -28,17 +28,16 @@ import seaborn as sns
 # CONSTANTS
 # -----------------
 FILE_LIST = [
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_1.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_2.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_3.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_4.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_5.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_6.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_7.xlsx'
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_1.xlsx',
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_2.xlsx',
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_3.xlsx',
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_4.xlsx',
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_5.xlsx',
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_6.xlsx',
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_7.xlsx'
 ]
-SAVE_DIR = "/Users/macbook/thesis_materials/visualization/maps/transects_wb.png"
-COMPASS_ROSE_PATH = '/Users/macbook/thesis_materials/python/helper_images/compass_rose.png'
-
+SAVE_DIR = "/Users/mitchtork/HawkEye_Evaluation/visualization/maps/transects_wb.png"
+COMPASS_ROSE_PATH = '/Users/mitchtork/HawkEye_Evaluation/python/helper_data/compass_rose.png'
 
 # -----------------
 # HELPER FUNCTIONS
@@ -94,10 +93,13 @@ def main():
     dfs, combined_dfs = load_transect_data(FILE_LIST)
     min_lon, max_lon, min_lat, max_lat = calculate_bounds(combined_dfs)
 
-    print(f"Encompassing square coordinates: \nTop-Left: ({min_lon}, {max_lat}), \nTop-Right: ({max_lon}, {max_lat}), \nBottom-Left: ({min_lon}, {min_lat}), \nBottom-Right: ({max_lon}, {min_lat})")
-
     fig, ax = plt.subplots(figsize=(10, 10), subplot_kw={'projection': ccrs.PlateCarree()})
-    ax.set_extent([min_lon, max_lon, min_lat, max_lat])
+    ax.set_extent([min_lon, max_lon, min_lat, max_lat], crs=ccrs.PlateCarree())
+
+    # Set the blank space around the plot to #FAFAFA
+    fig.patch.set_facecolor('#FAFAFA')
+    ax.set_facecolor('#FAFAFA')
+
     plot_transects(ax, dfs, colors)
 
     legend_handles = [Line2D([0], [0], color=colors[i], lw=2, label=f"Transect {i+1}") for i in range(n_colors)]
@@ -113,7 +115,7 @@ def main():
     plt.title("RV Cape Fear, May 05 2023, Wilmington, NC")
 
     # Compass rose (bottom right corner of map)
-    compass_rose_image = mpimg.imread('/Users/macbook/python_programs/thesis/images/compass_rose.png')
+    compass_rose_image = mpimg.imread('/Users/mitchtork/HawkEye_Evaluation/python/helper_data/compass_rose.png')
     compass_position = (max_lon - 0.03, min_lat + 0.0125)  # Positioned near bottom right
     compass_size = 0.02
     ax.imshow(compass_rose_image, extent=[compass_position[0], compass_position[0] + compass_size, compass_position[1], compass_position[1] + compass_size], transform=ccrs.PlateCarree(), zorder=10)
@@ -130,7 +132,6 @@ def main():
         os.makedirs(os.path.dirname(SAVE_DIR))
     plt.savefig(SAVE_DIR, dpi=300, bbox_inches='tight')
     print(f"Map of transects plotted and saved to {SAVE_DIR}.")
-
 
 # -----------------
 # SCRIPT EXECUTION

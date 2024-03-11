@@ -1,75 +1,75 @@
 import pandas as pd
+import numpy as np
+from scipy import stats
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
 import seaborn as sns
 import matplotlib.pyplot as plt
-from scipy import stats
+import os
 
-# Load the data
-df = pd.read_excel('/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/satsitu.xlsx')
+def mean_absolute_percentage_error(y_true, y_pred): 
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    non_zero_mask = y_true != 0
+    return np.mean(np.abs((y_true[non_zero_mask] - y_pred[non_zero_mask]) / y_true[non_zero_mask])) * 100
 
-# Data cleaning: Remove rows with missing values in relevant columns
-df.dropna(subset=['in_situ_chl', 'hawkeye_chl', 'modisa_chl', 's3a_chl', 's3b_chl'], inplace=True)
+def bias(y_true, y_pred):
+    return np.mean(y_pred - y_true)
 
-# Save descriptive statistics to a CSV file
-desc_stats = df.describe()
-desc_stats.to_csv('descriptive_statistics.csv')
-print("Descriptive Statistics saved to descriptive_statistics.csv")
+# Load the dataset
+file_path = '/Users/mitchtork/HawkEye_Evaluation/data/satsitu/aggregated_data/master_dataset.csv'
+df = pd.read_csv(file_path)
 
-# Visualize distributions with displot and save figures
-plt.figure(figsize=(10, 6))
-for column in ['hawkeye_chl', 'modisa_chl', 's3a_chl', 's3b_chl']:
-    sns.displot(df[column], kind="kde", label=column)
-    plt.legend()
-    plt.title(f'Distribution of {column}')
-    plt.savefig(f'distribution_{column}.png')
-    plt.close()
+sensor_name = 's3b'  # replace with 'hawkeye', 'oli8', 's3a', or 's3b' as needed
+pixel_window_size = '1x1'  # replace with '1x1', '2x2', or '3x3' as needed
 
-sns.displot(df['in_situ_chl'], kind="kde", color='k', label='in_situ_chl')
-plt.legend()
-plt.title('Distribution of in_situ_chl')
-plt.savefig('distribution_in_situ_chl.png')
+# Calculate statistics for the chosen pixel window size
+true_values = df[f'{sensor_name}_insitu_chl_{pixel_window_size}']
+predicted_values = df[f'{sensor_name}_chl_{pixel_window_size}']
+
+# Remove NaN values from the analysis
+mask = ~np.isnan(true_values) & ~np.isnan(predicted_values)
+true_values, predicted_values = true_values[mask], predicted_values[mask]
+
+# RMSE
+rmse = np.sqrt(mean_squared_error(true_values, predicted_values))
+
+# MAPE
+mape = mean_absolute_percentage_error(true_values, predicted_values)
+
+# Bias
+bias_value = bias(true_values, predicted_values)
+
+# Regression
+regressor = LinearRegression()
+regressor.fit(true_values.values.reshape(-1, 1), predicted_values.values)
+predicted_chl_reg = regressor.predict(true_values.values.reshape(-1, 1))
+
+# R²
+r2 = r2_score(true_values, predicted_chl_reg)
+
+# Plotting the results with statistical annotations
+plt.figure(figsize=(10, 6), facecolor='#FAFAFA')
+sns.scatterplot(x=true_values, y=predicted_values, alpha=0.7)
+
+plt.plot(true_values, predicted_chl_reg, color='#F76B34', linewidth=2)
+plt.title(f'Regression and Error Analysis for {sensor_name.capitalize()} ({pixel_window_size} Pixels)')
+plt.xlabel('In-Situ Chlorophyll (µg/L)')
+plt.ylabel(f'{sensor_name.capitalize()} Chlorophyll (µg/L)')
+
+# Annotations with the statistical metrics, changing annotation box color to #F76B34
+plt.annotate(f'RMSE: {rmse:.2f}\nMAPE: {mape:.2f}%\nBias: {bias_value:.2f}\nR²: {r2:.2f}',
+             xy=(0.97, 0.95), xycoords='axes fraction',
+             horizontalalignment='right', verticalalignment='top',
+             bbox=dict(boxstyle='round,pad=0.5', fc='#F76B34', alpha=0.5))
+
+# Output directory for plots
+output_dir = '/Users/mitchtork/HawkEye_Evaluation/data/satsitu/statistics'
+
+# Check if output directory exists, if not, create it
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
+# Save the plot to the output directory
+plot_filename = os.path.join(output_dir, f'{sensor_name}_{pixel_window_size}_regression_and_error_analysis.png')
+plt.savefig(plot_filename, bbox_inches='tight')
 plt.close()
-
-# Correlation Analysis and save results
-correlations = df.corr()
-correlations.to_csv('correlation_analysis.csv')
-print("Correlation analysis saved to correlation_analysis.csv")
-
-# Regression Analysis and Bland-Altman Plot
-for satellite in ['hawkeye_chl', 'modisa_chl', 's3a_chl', 's3b_chl']:
-    # Regression Analysis
-    plt.figure(figsize=(8, 6))
-    sns.lmplot(x='in_situ_chl', y=satellite, data=df)
-    plt.title(f'Regression: in_situ_chl vs {satellite}')
-    plt.xlabel('In Situ Chlorophyll')
-    plt.ylabel(f'{satellite} Chlorophyll')
-    plt.savefig(f'regression_in_situ_vs_{satellite}.png')
-    plt.close()
-
-    # Bland-Altman Plot
-    df['average'] = df[['in_situ_chl', satellite]].mean(axis=1)
-    df['difference'] = df['in_situ_chl'] - df[satellite]
-    plt.figure(figsize=(8, 6))
-    sns.scatterplot(x='average', y='difference', data=df)
-    plt.axhline(df['difference'].mean(), color='red', linestyle='--', label='Mean difference')
-    plt.axhline(df['difference'].mean() + 1.96*df['difference'].std(), color='blue', linestyle='--', label='Upper limit of agreement')
-    plt.axhline(df['difference'].mean() - 1.96*df['difference'].std(), color='blue', linestyle='--', label='Lower limit of agreement')
-    plt.title(f'Bland-Altman Plot: in_situ_chl vs {satellite}')
-    plt.xlabel('Average Chlorophyll Concentration')
-    plt.ylabel('Difference in Chlorophyll Concentration')
-    plt.legend()
-    plt.savefig(f'bland_altman_in_situ_vs_{satellite}.png')
-    plt.close()
-
-# Paired Statistical Tests
-paired_tests_results = {'Satellite': [], 'T-statistic': [], 'P-value': []}
-for satellite in ['hawkeye_chl', 'modisa_chl', 's3a_chl', 's3b_chl']:
-    t_stat, p_value = stats.ttest_rel(df['in_situ_chl'], df[satellite])
-    paired_tests_results['Satellite'].append(satellite)
-    paired_tests_results['T-statistic'].append(t_stat)
-    paired_tests_results['P-value'].append(p_value)
-    print(f"Paired T-test for in_situ_chl vs {satellite}: T-statistic = {t_stat:.4f}, P-value = {p_value:.4g}")
-
-# Convert paired test results to DataFrame and save
-paired_tests_df = pd.DataFrame(paired_tests_results)
-paired_tests_df.to_csv('paired_tests_results.csv', index=False)
-print("Paired T-test results saved to paired_tests_results.csv")

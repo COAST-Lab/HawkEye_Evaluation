@@ -10,9 +10,17 @@ import os
 def load_chlor_a_data(file_path):
     # Load chlorophyll-a data from a given NetCDF file.
     with Dataset(file_path, 'r') as nc:
-        chlor_a = nc.variables['chlor_a'][:]
-        chlor_a[chlor_a == nc.variables['chlor_a']._FillValue] = np.nan  # Handle fill values
-        return np.ma.array(chlor_a, mask=np.isnan(chlor_a))  # Return as masked array for NaNs
+        group = nc.groups['Mapped_Data_and_Params']  # Access the group first
+        chlor_a_mean = group.variables['chlor_a-mean'][:]  # Then access the variable within the group
+        
+        # Check for the _FillValue attribute and handle it if present
+        if '_FillValue' in group.variables['chlor_a-mean'].ncattrs():
+            fill_value = group.variables['chlor_a-mean']._FillValue  # Get the fill value from the variable
+            chlor_a_mean[chlor_a_mean == fill_value] = np.nan  # Replace fill values with NaN
+        else:
+            chlor_a_mean = np.where(chlor_a_mean.mask, np.nan, chlor_a_mean)  # Use the mask to replace fill values with NaN, if _FillValue is not available
+        
+        return np.ma.array(chlor_a_mean, mask=np.isnan(chlor_a_mean))  # Return as masked array for NaNs
 
 def calculate_difference(data1, data2):
     # Calculate the day-to-day difference between two datasets.
@@ -52,8 +60,8 @@ def main():
     lon_west, lon_east, lat_south, lat_north = -77.85, -77.70, 34.10, 34.25
 
     # File paths to the chlorophyll-a data from Sentinel-3A and Sentinel-3B
-    s3a_file_path = '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/s3a/daily/chlor_a/mean/S3A_OLCI_EFRNT.2023050720230507.chlor_a-mean.smi.nc'
-    s3b_file_path = '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/s3b/daily/chlor_a/mean/S3B_OLCI_EFR.2023050620230506.chlor_a-mean.smi.nc'
+    s3a_file_path = '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/sensors/s3a/l1a-l3/daily/300m-chlor_a/mean/S3A_OLCI_EFR.2023050720230507.DLY.chlor_a.map.nc'
+    s3b_file_path = '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/sensors/s3b/l1a-l3/daily/300m-chlor_a/mean/S3B_OLCI_EFR.2023050620230506.DLY.chlor_a.map.nc'
     
     # Load the chlorophyll-a data
     s3a_chlor_a = load_chlor_a_data(s3a_file_path)
@@ -70,29 +78,33 @@ def main():
      # Calculate the difference between the two satellite datasets
     difference = calculate_difference(s3a_chlor_a, s3b_chlor_a)
     
-     # Plotting
+    # Plotting
     fig, ax = plt.subplots(figsize=(10, 8), subplot_kw={'projection': ccrs.PlateCarree()})
     ax.set_extent([lon_west, lon_east, lat_south, lat_north], crs=ccrs.PlateCarree())
-    
-    # Adding geographical features
+
+    # Set the figure and axes background color
+    fig.patch.set_facecolor('#FAFAFA')
+    ax.patch.set_facecolor('#FAFAFA')  # Sets the plot background color
+
+    # Adding geographical features with specified facecolor for land and ocean
     feature = cfeat.GSHHSFeature(scale='full', levels=[1], facecolor='gray', edgecolor='black')
     ax.add_feature(feature)
-    
-    # Plotting the data
+
+    # Ensure NaN values or masked areas in 'difference' are handled to match the background
     img = ax.imshow(difference, cmap=cmocean.cm.balance_r, vmin=-np.nanmax(np.abs(difference)), vmax=np.nanmax(np.abs(difference)),
-                    extent=[lon_west, lon_east, lat_south, lat_north], transform=ccrs.PlateCarree(), origin='upper')
-    
+                extent=[lon_west, lon_east, lat_south, lat_north], transform=ccrs.PlateCarree(), origin='upper')
+
     # Adding colorbar with label
     cbar = plt.colorbar(img, ax=ax, shrink=0.7)
-    cbar.set_label('Chlorophyll-a Diff (mg m^-3)', fontsize=12)
+    cbar.set_label('Chlorophyll-a Diff (µg/L)', fontsize=12)
     
     # Setting x and y labels
     ax.set_xlabel('Longitude', fontsize=12)
     ax.set_ylabel('Latitude', fontsize=12)
     
     # Formatting and setting the axis labels and ticks
-    ax.set_xticks(np.linspace(lon_west, lon_east, 5), crs=ccrs.PlateCarree())
-    ax.set_yticks(np.linspace(lat_south, lat_north, 5), crs=ccrs.PlateCarree())
+    ax.set_xticks(np.linspace(lon_west, lon_east, 4), crs=ccrs.PlateCarree())
+    ax.set_yticks(np.linspace(lat_south, lat_north, 4), crs=ccrs.PlateCarree())
     ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: longitude_formatter(x)))
     ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: latitude_formatter(y)))
     

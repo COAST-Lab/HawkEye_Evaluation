@@ -1,22 +1,31 @@
 import numpy as np
 import pandas as pd
 from netCDF4 import Dataset
-from my_hdf_cdf_utilities import read_hdf_prod
-from my_general_utilities import *
 
-# Function to calculate indices based on fixed geographic bounds
+# New function to read a product from netCDF4 file, considering group structures
+def read_product_netCDF4(file_path, product_name, group_name):
+    try:
+        with Dataset(file_path, 'r') as nc:
+            group = nc.groups[group_name]
+            product_data = group.variables[product_name][:]
+            return product_data
+    except KeyError as e:
+        print(f"KeyError - the variable '{product_name}' in group '{group_name}' was not found in {file_path}: {e}")
+        return None
+    except Exception as e:
+        print(f"An error occurred while reading '{product_name}' from {file_path}: {e}")
+        return None
+
+# Function to calculate indices based on fixed geographic bounds remains unchanged
 def calculate_indices(lat, lon, array_shape):
-    # Fixed geographic bounds
     north_bound = 34.25
     south_bound = 34.10
     east_bound = -77.70
     west_bound = -77.85
 
-    # Calculate the latitude and longitude resolutions
     lat_res = (north_bound - south_bound) / array_shape[0]
     lon_res = (east_bound - west_bound) / array_shape[1]
 
-    # Calculate the row and column indices
     irow = int((north_bound - lat) / lat_res)
     icol = int((lon - west_bound) / lon_res)
 
@@ -24,25 +33,30 @@ def calculate_indices(lat, lon, array_shape):
 
 # Paths to the in situ data
 acrobat_fname = '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/processed_dataset.xlsx'
-output_acrobat_fname = '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/satsitu.xlsx'
+output_acrobat_fname = '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/satsitu.csv'
 
 # Satellite data files
 satellite_files = {
-    'hawkeye': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/hawkeye/daily/chlor_a/mean/SEAHAWK1_HAWKEYE.2023050720230507.chlor_a-mean.smi.nc',
-    'modisa': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/modisa/daily/chlor_a/mean/AQUA_MODIS.2023050720230507.chlor_a-mean.smi.nc',
-    's3a': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/s3a/daily/chlor_a/mean/S3A_OLCI_EFRNT.2023050720230507.chlor_a-mean.smi.nc',
-    's3b': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/locations/masonboro/s3b/daily/chlor_a/mean/S3B_OLCI_EFR.2023050620230506.chlor_a-mean.smi.nc'
+    'hawkeye': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/sensors/hawkeye/l1a-l3/daily/75m-chlor_a/mean/SEAHAWK1_HAWKEYE.2023050720230507.DLY.chlor_a.map.nc',
+    'modisa': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/sensors/modisa/l1a-l3/daily/1000m-chlor_a/mean/AQUA_MODIS.2023050720230507.DLY.chlor_a.map.nc',
+    's3b': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/sensors/s3b/l1a-l3/daily/300m-chlor_a/mean/S3B_OLCI_EFR.2023050620230506.DLY.chlor_a.map.nc',
+    's3a': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/sensors/s3a/l1a-l3/daily/300m-chlor_a/mean/S3A_OLCI_EFR.2023050720230507.DLY.chlor_a.map.nc',
+    'oli8': '/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/sensors/landsat/l1a-l3/daily/30m-chlor_a/mean/LANDSAT8_OLI.2023050320230503.DLY.chlor_a.map.nc'
 }
 
 # Read in the Excel file of Acrobat data
 df = pd.read_excel(acrobat_fname)
 
-# Read satellite data into numpy arrays
+# Read satellite data into numpy arrays, now using the updated function
 satellite_chl_arrays = {}
 for sensor_name, file_path in satellite_files.items():
-    chl_array = read_hdf_prod(file_path, 'chlor_a')
-    satellite_chl_arrays[sensor_name] = chl_array
-    print(f"{sensor_name} dimensions: {chl_array.shape} (y, x)")
+    # Adjust the product name and group name based on your netCDF structure
+    chl_array = read_product_netCDF4(file_path, 'chlor_a-mean', 'Mapped_Data_and_Params')
+    if chl_array is None:
+        print(f"Failed to read chlor_a-mean data from {sensor_name}")
+    else:
+        satellite_chl_arrays[sensor_name] = chl_array
+        print(f"{sensor_name} dimensions: {chl_array.shape} (y, x)")
 
 # Replace fill values with NaN
 fill_value = -32767.0
@@ -59,11 +73,18 @@ for i, row in df.iterrows():
         # Ensure indices are within the bounds of the chlorophyll data array
         if 0 <= irow < chl_array.shape[0] and 0 <= icol < chl_array.shape[1]:
             df.at[i, sensor_name + '_chl'] = chl_array[irow, icol]
+            # Store the calculated row and column indices
+            df.at[i, sensor_name + '_irow'] = irow
+            df.at[i, sensor_name + '_icol'] = icol
         else:
             # Handle cases where calculated indices are outside the array bounds
             df.at[i, sensor_name + '_chl'] = np.nan
+            # Set indices to NaN or another placeholder if out-of-bounds
+            df.at[i, sensor_name + '_irow'] = np.nan
+            df.at[i, sensor_name + '_icol'] = np.nan
 
 # Write the updated DataFrame to a new Excel file
-df.to_excel(output_acrobat_fname, index=False)
+df.to_csv(output_acrobat_fname, index=False)
 
-print("Satellite data matching completed.")
+print("Satellite data matching and index recording completed.")
+

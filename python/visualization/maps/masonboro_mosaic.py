@@ -18,30 +18,32 @@ import matplotlib.ticker as mticker
 # CONSTANTS
 # -----------------
 FILE_LIST = [
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_1.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_2.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_3.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_4.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_5.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_6.xlsx',
-    '/Users/macbook/thesis_materials/data/acrobat/050523/transects/cleaned_data/cleaned_data_transect_7.xlsx'
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_1.xlsx',
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_2.xlsx',
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_3.xlsx',
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_4.xlsx',
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_5.xlsx',
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_6.xlsx',
+    '/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/transect_7.xlsx'
 ]
-SAVE_DIR = "/Users/macbook/thesis_materials/visualization/maps/masonboro"
+SAVE_DIR = "/Users/mitchtork/HawkEye_Evaluation/visualization/maps/masonboro"
 
-SATELLITE_IMAGES_DIR = "/Users/macbook/thesis_materials/data/satellite_matchups_mod/locations/masonboro/products/chlor/crops"
-SATELLITE_NAMES = ["HawkEye", "MODIS", "S3A", "S3B"]
-SATELLITE_IMG_FILES = ["SEAHAWK1_HAWKEYE.2023050720230507.chlor_a-mean_crop.png", "AQUA_MODIS.2023050720230507.chlor_a-mean_crop.png", "S3A_OLCI_EFRNT.2023050720230507.chlor_a-mean_crop.png", "S3B_OLCI_EFR.2023050620230506.chlor_a-mean_crop.png"]
-PIXEL_RESOLUTIONS_METERS = [120, 1000, 300, 3]
+SATELLITE_IMAGES_DIR = "/Users/mitchtork/HawkEye_Evaluation/data/satellite_matchups/crops"
+SATELLITE_NAMES = ["HawkEye", "MODIS", "S3A", "S3B", "OLI8"]
+SATELLITE_IMG_FILES = ["SEAHAWK1_HAWKEYE.2023050720230507.DLY.chlor_a.png", "AQUA_MODIS.2023050720230507.DLY.chlor_a.png", "S3A_OLCI_EFR.2023050720230507.DLY.chlor_a.png", "S3B_OLCI_EFR.2023050620230506.DLY.chlor_a.png", "LANDSAT8_OLI.2023050320230503.DLY.chlor_a.png"]
+PIXEL_RESOLUTIONS_METERS = [120, 1000, 300, 300, 30]
+
 SAT_IMG_BOUNDS = [34.1, 34.24, -77.85, -77.70]  # [min_lat, max_lat, min_lon, max_lon]
 
 SUBPLOT_TITLES = [
     "RV Cape Fear, Masonboro Inlet - HawkEye (120m) from May 07, 2023",
     "RV Cape Fear, Masonboro Inlet - MODIS (1000m) from May 07, 2023",
     "RV Cape Fear, Masonboro Inlet - S3A (300m) from May 07, 2023",
-    "RV Cape Fear, Masonboro Inlet - S3B (300m) from May 06, 2023"
+    "RV Cape Fear, Masonboro Inlet - S3B (300m) from May 06, 2023",
+    "RV Cape Fear, Masonboro Inlet - OLI8 (30m) from May 03, 2023"
 ]
 
-COMPASS_ROSE_PATH = '/Users/macbook/thesis_materials/python/helper_data/compass_rose.png'
+COMPASS_ROSE_PATH = '/Users/mitchtork/HawkEye_Evaluation/python/helper_data/compass_rose.png'
 
 # -----------------
 # HELPER FUNCTIONS
@@ -89,19 +91,21 @@ def main():
 
     dfs, combined_dfs = load_transect_data(FILE_LIST)
     
-    # Create the save directory if it doesn't exist
     if not os.path.exists(SAVE_DIR):
         os.makedirs(SAVE_DIR)
 
-    # Create a mosaic figure with subplots for each satellite image
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16, 16), subplot_kw={'projection': ccrs.PlateCarree()}, dpi=150)  # Adjust nrows and ncols based on the number of images
-    axes = axes.flatten()
+    # Adjusting the subplot grid to 3x2 to accommodate 5 images
+    fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(16, 24), subplot_kw={'projection': ccrs.PlateCarree()}, dpi=150)
+    fig.patch.set_facecolor('#FAFAFA')  # Set the figure's background color to #FAFAFA
 
-    # Adjust spacing between subplots
+    axes = axes.flatten()
     plt.subplots_adjust(wspace=0.1, hspace=0.1)
 
     for i, (satellite_name, img_file, pixel_resolution_meters) in enumerate(zip(SATELLITE_NAMES, SATELLITE_IMG_FILES, PIXEL_RESOLUTIONS_METERS)):
+        if i >= 5:  # Ensuring we don't go beyond the number of provided subplots
+            break
         ax = axes[i]
+        ax.set_facecolor('#FAFAFA')  # Set each subplot background color
         
         pixel_resolution_degrees = meters_to_degrees(pixel_resolution_meters, 34.1)
 
@@ -111,15 +115,12 @@ def main():
         min_lat, max_lat, min_lon, max_lon = SAT_IMG_BOUNDS
         ax.set_extent([min_lon, max_lon, min_lat, max_lat], crs=ccrs.PlateCarree())
 
-        # Read and display the satellite image
-        satellite_img = mpimg.imread(satellite_img_path)
-
-        # Check if the image size is too large
-        if satellite_img.shape[0] > 65536 or satellite_img.shape[1] > 65536:
-            print(f"Warning: Image '{img_file}' is too large and may not display correctly.")
+        try:
+            satellite_img = mpimg.imread(satellite_img_path)
+            ax.imshow(satellite_img, extent=[min_lon, max_lon, min_lat, max_lat], transform=ccrs.PlateCarree(), origin='upper', aspect='auto')
+        except FileNotFoundError:
+            print(f"File not found: {satellite_img_path}")
             continue
-
-        ax.imshow(satellite_img, extent=[min_lon, max_lon, min_lat, max_lat], transform=ccrs.PlateCarree(), origin='upper', aspect='auto')
 
         plot_transects(ax, dfs, colors)
 
@@ -148,18 +149,13 @@ def main():
         ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins=5, prune='both'))
         ax.yaxis.set_major_locator(mticker.MaxNLocator(nbins=5, prune='both'))
 
-    # Adjust the spacing between columns
-    plt.subplots_adjust(wspace=0.15)
+    # Optionally, hide the last subplot if not in use
+    axes[-1].axis('off')
 
-    # Adjust save path for the mosaic
+    plt.subplots_adjust(wspace=0.15)  # Adjust spacing between subplots
     mosaic_save_path = os.path.join(SAVE_DIR, "mosaic_map.png")
     plt.savefig(mosaic_save_path, dpi=300, bbox_inches='tight')
-
-    # Close the mosaic figure
     plt.close(fig)
 
-# -----------------
-# SCRIPT EXECUTION
-# -----------------
 if __name__ == '__main__':
     main()

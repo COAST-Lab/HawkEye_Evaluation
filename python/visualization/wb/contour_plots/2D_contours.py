@@ -1,4 +1,4 @@
-# Script Title: Individual Transect Data Gradient Visualizer
+# Individual Transect Data Gradient Visualizer
 # Author: Mitch Torkelson
 # Updated: 11/16/2023
 
@@ -60,7 +60,7 @@ plt.rcParams['figure.dpi'] = 500  # Figure resolution
 # CONSTANTS
 # -----------------
 
-BASE_DIR = '/Users/mitchtork/HawkEye_Eval/'
+BASE_DIR = '/Users/mitchtork/HawkEye_Evaluation/'
 DATA_DIR = os.path.join(BASE_DIR, 'data/acrobat/050523/transects/processed_transects')
 
 # Dynamically set the SAVE_DIR based on the DATA_TYPE and INTERPOLATION_METHOD
@@ -193,6 +193,10 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
 
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 
+        # Set the background color of the figure and axes
+        fig.patch.set_facecolor('#FAFAFA')  # Set the figure's background color
+        ax.set_facecolor('#FAFAFA')  # Set the axes' background color
+
         if ENABLE_INTERPOLATION:
             # Interpolation of the data
             zi = griddata((df['normalized_distance'], df['depth']), df[DATA_TYPE], (xi, yi), method=INTERPOLATION_METHOD)
@@ -274,6 +278,7 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
         # Saving the figure with the specified DPI
         plt.savefig(f"{SAVE_DIR}/transect_{idx + 1}.png", dpi=plt.rcParams['figure.dpi'], bbox_inches='tight')
         plt.close()
+
 # -----------------
 # SCRIPT EXECUTION
 # -----------------
