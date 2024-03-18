@@ -3,14 +3,21 @@ import pandas as pd
 from scipy.ndimage import generic_filter
 import os
 
+# Dynamically set the base directory to the script's location
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Define data and output directories relative to BASE_DIR
+DATA_DIR = os.path.join(BASE_DIR, 'data', 'acrobat', '050523', 'transects', 'processed_transects')
+OUTPUT_DIR = os.path.join(BASE_DIR, 'data', 'satsitu', 'aggregated_data')
+
 def apply_sliding_window_aggregation(data, window_size):
-    """Apply sliding window averaging over a 2D grid, ignoring NaN values."""
+    # Apply sliding window averaging over a 2D grid, ignoring NaN values.
     if window_size == 1:  # No aggregation needed for 1x1, return original data
         return data
     return generic_filter(data, np.nanmean, size=(window_size, window_size), mode='constant', cval=np.NaN)
 
 def populate_grid(df, value_column, irow_column, icol_column, grid_shape):
-    """Populate a grid with values from a DataFrame based on specified row and column indices."""
+    # Populate a grid with values from a DataFrame based on specified row and column indices.
     grid = np.full(grid_shape, np.nan)
     for _, row in df.iterrows():
         irow = int(row[irow_column])
@@ -19,8 +26,8 @@ def populate_grid(df, value_column, irow_column, icol_column, grid_shape):
             grid[irow, icol] = row[value_column]
     return grid
 
-# Load the dataset
-df = pd.read_csv('/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/satsitu.csv')
+# Load the dataset with a relative path
+df = pd.read_csv(os.path.join(DATA_DIR, 'satsitu_l2.csv'))
 
 # Determine the grid size based on the maximum irow and icol for oli8 data
 max_irow = int(df['oli8_irow'].max()) + 1
@@ -56,13 +63,10 @@ for window_size in window_sizes:
         if 0 <= flat_index < len(flat_insitu):
             df.at[index, f'insitu_chl_{window_size}x{window_size}'] = flat_insitu[flat_index]
 
-# Output directory
-output_dir = '/Users/mitchtork/HawkEye_Evaluation/data/satsitu/aggregated_data/'
-
 # Check if output directory exists, if not, create it
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
 
 # Save the processed DataFrame to a new CSV file in the output directory
-output_filename = os.path.join(output_dir, 'oli8.csv')
+output_filename = os.path.join(OUTPUT_DIR, 'oli8_l2.csv')
 df.to_csv(output_filename, index=False)

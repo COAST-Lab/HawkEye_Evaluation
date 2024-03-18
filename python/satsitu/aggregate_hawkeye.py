@@ -20,7 +20,7 @@ def populate_grid(df, value_column, irow_column, icol_column, grid_shape):
     return grid
 
 # Load the dataset
-df = pd.read_csv('/Users/mitchtork/HawkEye_Evaluation/data/acrobat/050523/transects/processed_transects/satsitu.csv')
+df = pd.read_csv('/Users/mitchtork/thesis/data/acrobat/050523/transects/processed_transects/satsitu_l2.csv')
 
 # Determine the grid size based on the maximum irow and icol for Hawkeye data
 max_irow = int(df['hawkeye_irow'].max()) + 1
@@ -57,12 +57,12 @@ for window_size in window_sizes:
             df.at[index, f'insitu_chl_{window_size}x{window_size}'] = flat_insitu[flat_index]
 
 # Output directory
-output_dir = '/Users/mitchtork/HawkEye_Evaluation/data/satsitu/aggregated_data/'
+output_dir = '/Users/mitchtork/thesis/data/satsitu/aggregated_data/'
 
 # Check if output directory exists, if not, create it
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 # Save the processed DataFrame to a new CSV file in the output directory
-output_filename = os.path.join(output_dir, 'hawkeye.csv')
+output_filename = os.path.join(output_dir, 'hawkeye_l2.csv')
 df.to_csv(output_filename, index=False)

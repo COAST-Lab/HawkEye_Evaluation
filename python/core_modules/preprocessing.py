@@ -3,14 +3,27 @@ import pandas as pd
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
-import time
+import csv
 
-BASE_DIR = '/Users/mitchtork/HawkEye_Eval/'
-DATA_DIR = os.path.join(BASE_DIR, 'data/acrobat/050523/transects')
-SAVE_DIR = os.path.join(BASE_DIR, 'data/acrobat/050523/transects/processed_transects')
-QC_REPORT_DIR = os.path.join(BASE_DIR, 'data/acrobat/050523/transects/processed_transects/QC_reports')
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Get the absolute path of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Calculate the relative path to the base directory ("Thesis")
+base_dir = os.path.abspath(os.path.join(script_dir, '..', '..', '..'))
+
+# Define paths relative to base_dir
+DATA_DIR = os.path.join(base_dir, 'data', 'acrobat', '050523', 'transects', 'unprocessed')
+SAVE_DIR = os.path.join(base_dir, 'data', 'acrobat', '050523', 'transects', 'processed')
+QC_REPORT_DIR = os.path.join(SAVE_DIR, 'QC_reports')
 QC_REPORT = os.path.join(QC_REPORT_DIR, 'QC_report.txt')
-OUTPUT_DATASET_FILE = os.path.join(SAVE_DIR, 'processed_dataset.xlsx')
+OUTPUT_DATASET_FILE = os.path.join(SAVE_DIR, 'processed_dataset.csv')
+
+# Ensure all necessary directories exist
+for directory in [DATA_DIR, SAVE_DIR, QC_REPORT_DIR]:
+    os.makedirs(directory, exist_ok=True)
 
 QC_PARAMS = {
     'time_increment': pd.Timedelta(minutes=15),
@@ -23,11 +36,6 @@ QC_PARAMS = {
     'ox_sat_min': 7.36, 'ox_sat_max': 7.54, 'ox_sat_spike_threshold': 0.1
     # Adjust the min, max, and spike threshold values as needed
 }
-
-# Create directories if they do not exist
-for directory in [SAVE_DIR, QC_REPORT_DIR]:
-    if not os.path.exists(directory):
-        os.makedirs(directory)
 
 # Function to reverse rows of DataFrame
 def reverse_dataframe_rows(df):
@@ -67,19 +75,30 @@ def perform_qc_tests(df, qc_params):
 def process_file(file):
     try:
         file_path = os.path.join(DATA_DIR, file)
-        df = pd.read_excel(file_path, engine='openpyxl')
+        
+        # Attempt to detect delimiter
+        with open(file_path, 'r', encoding='ISO-8859-1') as f:  # Use ISO-8859-1 to avoid encoding issues
+            first_line = f.readline()
+            sniffer = csv.Sniffer()
+            dialect = sniffer.sniff(first_line)
+            delimiter = dialect.delimiter
+        
+        # Read CSV with detected delimiter
+        df = pd.read_csv(file_path, delimiter=delimiter, encoding='ISO-8859-1')
+        
         cleaned_df, qc_report = perform_qc_tests(df, QC_PARAMS)
 
-        # Extract transect ID from filename and reverse if odd
-        transect_id_str = file.split('.')[0].replace('transect', '')  # Remove 'transect' from the filename
-        transect_id = int(transect_id_str)  # Convert to integer
-        if transect_id % 2 != 0:  # Check if the transect ID is odd
+        # Extract and process transect_id as before
+        transect_id_str = file.split('.')[0].replace('transect', '')
+        transect_id = int(transect_id_str)
+        if transect_id % 2 != 0:
             cleaned_df = reverse_dataframe_rows(cleaned_df)
+        
+        cleaned_df['transect_id'] = transect_id
 
         return cleaned_df, qc_report, transect_id
     except Exception as e:
         logging.error(f"Error processing file {file}: {e}")
-        print(f"Error processing file {file}: {e}")
         return None, {}, None
 
 # Check if the data directory exists
@@ -90,7 +109,7 @@ else:
     qc_reports = {}
 
     # Filter out temporary and irrelevant files
-    valid_files = [file for file in os.listdir(DATA_DIR) if file.endswith('.xlsx') and not file.startswith('~$')]
+    valid_files = [file for file in os.listdir(DATA_DIR) if file.endswith('.csv') and not file.startswith('~$')]
 
     # Sort files by transect ID if necessary
     sorted_files = sorted(valid_files, key=lambda x: int(x.replace('transect', '').split('.')[0]))
@@ -104,13 +123,13 @@ else:
                 combined_data = pd.concat([combined_data, result], ignore_index=True)
 
     # Save the entire processed dataset to an Excel file
-    combined_data.to_excel(OUTPUT_DATASET_FILE, index=False)
+    combined_data.to_csv(OUTPUT_DATASET_FILE, index=False)
     print(f'Entire processed dataset saved to {OUTPUT_DATASET_FILE}')
     
     # Split the cleaned (and reversed if even) data into separate files based on transect ID
     for transect_id, data in tqdm(combined_data.groupby('transect_id')):
-        output_file_path = os.path.join(SAVE_DIR, f'transect_{transect_id}.xlsx')
-        data.to_excel(output_file_path, index=False)
+        output_file_path = os.path.join(SAVE_DIR, f'transect_{transect_id}.csv')
+        data.to_csv(output_file_path, index=False)
         print(f'Processed DataFrame for Transect {transect_id} saved to {output_file_path}')
 
     # Save QC reports to a file

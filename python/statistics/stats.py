@@ -3,9 +3,23 @@ import numpy as np
 from scipy import stats
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
+import statsmodels.api as sm
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
+
+# Dynamically calculate the base directory based on the script's location
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Define paths for the dataset and the output directory relative to script_dir
+data_dir = os.path.join(script_dir, '../../../data/satsitu/aggregated_data')
+output_dir = os.path.join(script_dir, '../../../data/satsitu/statistics/l3')
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
+# Load the dataset with a relative path
+file_path = os.path.join(data_dir, 'master_dataset_l3.csv')
+df = pd.read_csv(file_path)
 
 def mean_absolute_percentage_error(y_true, y_pred): 
     y_true, y_pred = np.array(y_true), np.array(y_pred)
@@ -15,11 +29,7 @@ def mean_absolute_percentage_error(y_true, y_pred):
 def bias(y_true, y_pred):
     return np.mean(y_pred - y_true)
 
-# Load the dataset
-file_path = '/Users/mitchtork/HawkEye_Evaluation/data/satsitu/aggregated_data/master_dataset.csv'
-df = pd.read_csv(file_path)
-
-sensor_name = 's3b'  # replace with 'hawkeye', 'oli8', 's3a', or 's3b' as needed
+sensor_name = 'modisa'  # replace with 'modisa', 'hawkeye', 'oli8', 's3a', or 's3b' as needed
 pixel_window_size = '1x1'  # replace with '1x1', '2x2', or '3x3' as needed
 
 # Calculate statistics for the chosen pixel window size
@@ -39,13 +49,13 @@ mape = mean_absolute_percentage_error(true_values, predicted_values)
 # Bias
 bias_value = bias(true_values, predicted_values)
 
-# Regression
-regressor = LinearRegression()
-regressor.fit(true_values.values.reshape(-1, 1), predicted_values.values)
-predicted_chl_reg = regressor.predict(true_values.values.reshape(-1, 1))
+# Regression with statsmodels to get the p-value
+X_sm = sm.add_constant(true_values.values.reshape(-1, 1))  # Adding a constant for the intercept
+model = sm.OLS(predicted_values.values, X_sm).fit()
+p_value = model.pvalues[1]  # p-value for the slope coefficient
 
-# R²
-r2 = r2_score(true_values, predicted_chl_reg)
+# You can still calculate predicted values for the line of best fit if needed
+predicted_chl_reg = model.predict(X_sm)
 
 # Plotting the results with statistical annotations
 plt.figure(figsize=(10, 6), facecolor='#FAFAFA')
@@ -56,18 +66,11 @@ plt.title(f'Regression and Error Analysis for {sensor_name.capitalize()} ({pixel
 plt.xlabel('In-Situ Chlorophyll (µg/L)')
 plt.ylabel(f'{sensor_name.capitalize()} Chlorophyll (µg/L)')
 
-# Annotations with the statistical metrics, changing annotation box color to #F76B34
-plt.annotate(f'RMSE: {rmse:.2f}\nMAPE: {mape:.2f}%\nBias: {bias_value:.2f}\nR²: {r2:.2f}',
+# Annotations with the statistical metrics
+plt.annotate(f'RMSE: {rmse:.2f}\nMAPE: {mape:.2f}%\nBias: {bias_value:.2f}\nP-value: {p_value:.4f}',
              xy=(0.97, 0.95), xycoords='axes fraction',
              horizontalalignment='right', verticalalignment='top',
              bbox=dict(boxstyle='round,pad=0.5', fc='#F76B34', alpha=0.5))
-
-# Output directory for plots
-output_dir = '/Users/mitchtork/HawkEye_Evaluation/data/satsitu/statistics'
-
-# Check if output directory exists, if not, create it
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
 
 # Save the plot to the output directory
 plot_filename = os.path.join(output_dir, f'{sensor_name}_{pixel_window_size}_regression_and_error_analysis.png')
