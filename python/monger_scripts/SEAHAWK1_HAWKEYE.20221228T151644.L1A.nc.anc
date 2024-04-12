@@ -1,8 +1,0 @@
-icefile=/Applications/seadas-8.3.10/ocssw/var/anc/2022/362/20221228120000-CMC-L4_GHRSST-SSTfnd-CMC0.1deg-GLOB-v02.0-fv03.0.nc
-met1=/Applications/seadas-8.3.10/ocssw/var/anc/2022/362/GMAO_MERRA2.20221228T150000.MET.nc
-met2=/Applications/seadas-8.3.10/ocssw/var/anc/2022/362/GMAO_MERRA2.20221228T160000.MET.nc
-met3=/Applications/seadas-8.3.10/ocssw/var/anc/2022/362/GMAO_MERRA2.20221228T160000.MET.nc
-ozone1=/Applications/seadas-8.3.10/ocssw/var/anc/2022/362/GMAO_MERRA2.20221228T150000.MET.nc
-ozone2=/Applications/seadas-8.3.10/ocssw/var/anc/2022/362/GMAO_MERRA2.20221228T160000.MET.nc
-ozone3=/Applications/seadas-8.3.10/ocssw/var/anc/2022/362/GMAO_MERRA2.20221228T160000.MET.nc
-sstfile=/Applications/seadas-8.3.10/ocssw/var/anc/2022/362/20221228120000-CMC-L4_GHRSST-SSTfnd-CMC0.1deg-GLOB-v02.0-fv03.0.nc
