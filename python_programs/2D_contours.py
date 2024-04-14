@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -12,11 +11,11 @@ from matplotlib.ticker import FormatStrFormatter
 from matplotlib.colors import LogNorm
 
 INTERPOLATION_METHOD = 'linear'     # options are linear, cubic, or nearest.
-DATA_TYPE = 'chlor_a'              # options only chlor_a.
+DATA_TYPE = 'chlor_a'               # options are temp, salinity, density, turbidity, cdom, chlor_a, ox_sat.
 
 SHOW_TRANSECT_TITLE = True          # Set to False to hide transect titles.
 SHOW_AXES_TITLES = True             # Set to False to hide axes titles.
-SHOW_COLORBAR = False                # Set to False to hide the colorbar.
+SHOW_COLORBAR = False               # Set to False to hide the colorbar.
 ENABLE_CONTOUR_OVERLAY = False      # Set to False to disable contour overlay.
 CONTOUR_LEVELS = {
     'temp': [20, 25],
@@ -125,23 +124,34 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
         max_distance = max(max_distance, accumulated_distance[-1])
         df['normalized_distance'] = accumulated_distance
 
-        # Initialize figure and axes for plotting
-        fig, ax = plt.subplots(figsize=(base_plot_width, base_plot_height))
-        ax.set_facecolor('#FAFAFA')  # Set the axes' background color
-
-        # Setup for the plotting based on DATA_TYPE
-        if DATA_TYPE == 'chlor_a':
+        # Dynamically define colormap and data label based on DATA_TYPE
+        if DATA_TYPE == 'temp':
+            colormap = cmocean.cm.thermal
+            data_label = 'Temperature (°C)'
+        elif DATA_TYPE == 'salinity':
+            colormap = cmocean.cm.haline
+            data_label = 'Salinity (PSU)'
+        elif DATA_TYPE == 'density':
+            colormap = cmocean.cm.dense
+            data_label = 'Density (kg/m³)'
+        elif DATA_TYPE == 'turbidity':
+            colormap = cmocean.cm.turbid
+            data_label = 'Turbidity (NTU)'
+        elif DATA_TYPE == 'cdom':
+            colormap = cmocean.cm.matter
+            data_label = 'CDOM'
+        elif DATA_TYPE == 'chlor_a':
             colormap = plt.cm.Greens
             data_label = 'Chlorophyll a (µg/L)'
             # Define fixed_min and fixed_max for chlorophyll a visualization
             fixed_min = 0.1  # Minimum value for the color scale
             fixed_max = 5.5  # Maximum value for the color scale
             norm = LogNorm(vmin=fixed_min, vmax=fixed_max)  # Using LogNorm for chlor_a
+        elif DATA_TYPE == 'ox_sat':
+            colormap = cmocean.cm.oxy
+            data_label = 'Oxygen Saturation (%)'
         else:
-            # Setup for other DATA_TYPEs as needed, with their own colormaps and normalization
-            # For simplicity, this example uses a generic setup
-            colormap = cmocean.cm.algae
-            norm = None  # Default to linear normalization for other data types
+            colormap = cmocean.cm.haline  # Default colormap
             data_label = f'{DATA_TYPE.capitalize()} value'
             
         # Initialize max_depth based on the depth data

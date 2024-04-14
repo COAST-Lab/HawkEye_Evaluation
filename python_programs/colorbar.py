@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 import numpy as np
+import cmocean
 import os
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
