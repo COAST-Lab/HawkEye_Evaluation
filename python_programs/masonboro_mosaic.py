@@ -143,7 +143,7 @@ def main():
     # Adjust subplot parameters to reduce white space
     plt.subplots_adjust(wspace=-0.5, hspace=0.2)
 
-    plt.savefig(os.path.join(SAVE_DIR, "mosaic_masonboro.png"), dpi=600, bbox_inches='tight')
+    plt.savefig(os.path.join(SAVE_DIR, "mosaic_masonboro.png"), dpi=300, bbox_inches='tight')
     plt.close(fig)
 
 if __name__ == '__main__':

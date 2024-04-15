@@ -14,12 +14,12 @@ Field missions will gather in-situ data, utilizing instruments capable of vertic
 
 ![Map of Transects at Masonboro Inlet](images/transects_wb.png "Map of the 7 transects at the mouth of Masonboro Inlet for in situ chlorophyll measurements.")
 
-## Preliminary Results
-Initial findings highlight the potential of HawkEye in providing high-resolution OC imagery, promising improvements in spatial understanding of marine biogeochemical dynamics. Detailed comparisons of satellite and in-situ data will inform the accuracy of OC remote sensing in coastal waters.
+![seven in situ transects](images/chlor_a_gradient.gif "GIF displaying the depth contours of the 7 transects' chlorophyll measurements.")
 
-![mosaic of satellite chlorophyll measurements](images/mosaic_masonboro.png)  
-  
-![seven in situ transects](images/chlor_a_gradient.gif)
+![mosaic of satellite chlorophyll measurements](images/mosaic_masonboro_may7.png "Satellite-derived chlorophyll measurements in the study region.")  
+
+## Preliminary Results
+Initial findings highlight the potential of HawkEye in providing high-resolution OC imagery, promising improvements in spatial understanding of marine biogeochemical dynamics. Detailed comparisons of satellite and in-situ data will inform the accuracy of OC remote sensing in coastal waters. 
 
 ## Future Work
 The project will continue with the analysis of collected data, matchup analysis, and the synthesis of findings. Results will be disseminated through academic publications, aiming to contribute valuable insights into OC remote sensing and its application in marine conservation.
