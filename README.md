@@ -16,7 +16,7 @@ Field missions will gather in-situ data, utilizing instruments capable of vertic
 
 ![seven in situ transects](images/chlor_a_gradient.gif "GIF displaying the depth contours of the 7 transects' chlorophyll measurements.")
 
-![mosaic of satellite chlorophyll measurements](images/mosaic_masonboro_may7.png "Satellite-derived chlorophyll measurements in the study region.")  
+![mosaic of satellite chlorophyll measurements](images/mosaic_masonboro_may07.png "Satellite-derived chlorophyll measurements in the study region.")  
 
 ## Preliminary Results
 Initial findings highlight the potential of HawkEye in providing high-resolution OC imagery, promising improvements in spatial understanding of marine biogeochemical dynamics. Detailed comparisons of satellite and in-situ data will inform the accuracy of OC remote sensing in coastal waters. 
