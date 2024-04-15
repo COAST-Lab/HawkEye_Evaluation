@@ -14,7 +14,7 @@ def create_colorbar(orientation='horizontal', title_size=12):  # Add title_size 
     fig_size = (12, 0.5) if orientation == 'horizontal' else (0.5, 12)
     
     # Create a figure and a single subplot with a facecolor of #FAFAFA
-    fig, ax = plt.subplots(figsize=fig_size, facecolor='#FAFAFA')
+    fig, ax = plt.subplots(figsize=fig_size) #facecolor='#FAFAFA'
 
     # Set the colormap
     cmap = plt.cm.Greens
@@ -43,11 +43,11 @@ def create_colorbar(orientation='horizontal', title_size=12):  # Add title_size 
     cbar.ax.tick_params(labelsize=12)
 
     # Set the background color of the colorbar to #FAFAFA
-    cbar.ax.set_facecolor('#FAFAFA')
+    #cbar.ax.set_facecolor('#FAFAFA')
 
     # Save the colorbar to a file with a #FAFAFA background
     colorbar_path = os.path.join(SAVE_DIR, f'colorbar_{orientation}.png')
-    plt.savefig(colorbar_path, dpi=300, bbox_inches='tight', facecolor='#FAFAFA')
+    plt.savefig(colorbar_path, dpi=300, bbox_inches='tight') #facecolor='#FAFAFA')
     print("Saving colorbar at:", colorbar_path)
 
     # Close the plot to avoid displaying it in the notebook output
