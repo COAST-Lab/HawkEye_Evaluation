@@ -5,11 +5,12 @@ import numpy as np
 import pandas as pd
 import os
 import cmocean
-import rasterio
 from scipy.interpolate import griddata
+from matplotlib.colors import LogNorm
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from tqdm import tqdm
 from PIL import Image
+
 
 INTERPOLATION_METHOD = 'linear' # linear, cubic, nearest
 DATA_TYPE = 'chlor_a'  # options are 'temp', 'salinity', 'density', 'turbidity', 'cdom', 'chlor_a', 'ox_sat'
@@ -29,7 +30,7 @@ colormap_and_label = {
     'density': (cmocean.cm.dense, 'Density (kg/m³)'),
     'turbidity': (cmocean.cm.turbid, 'Turbidity (NTU)'),
     'cdom': (cmocean.cm.matter, 'CDOM'),
-    'chlor_a': (cmocean.cm.algae, 'Chlorophyll a (µg/L)'),
+    'chlor_a': (plt.cm.Greens, 'Chlorophyll a (µg/L)'),
     'ox_sat': (cmocean.cm.oxy, 'Oxygen Saturation (%)')
 }
 
@@ -66,15 +67,12 @@ def get_global_min_max(file_names):
     global_max_values[DATA_TYPE] = max(global_max)
     return min(global_min_depth), max(global_max_depth)
 
+
 def plot_3D_transects(file_names, global_min, global_max, global_min_depth, global_max_depth, upto_idx):
-    colormap, data_label = colormap_and_label.get(DATA_TYPE, (cmocean.cm.haline, f'{DATA_TYPE.capitalize()} value'))
-
-    global_min = global_min_values[DATA_TYPE]
-    global_max = global_max_values[DATA_TYPE]
-
+    colormap, data_label = colormap_and_label[DATA_TYPE]
     fig = plt.figure(figsize=(12, 10))
     ax = fig.add_subplot(111, projection='3d')
-    
+
     distances_from_shore = []
     
     dfs = []  # Store DataFrames after reading them
@@ -87,7 +85,7 @@ def plot_3D_transects(file_names, global_min, global_max, global_min_depth, glob
         distances_from_shore.append(distance_from_shore)
     
     sorted_files_and_dfs = sorted(zip(distances_from_shore, dfs, file_names))
-    
+
     # Only loop through transects up to the specified index
     for idx, (distance, df, fname) in enumerate(sorted_files_and_dfs[:upto_idx + 1]):
         print(f"Interpolating and visualizing data for file: {fname}...")
@@ -122,23 +120,17 @@ def plot_3D_transects(file_names, global_min, global_max, global_min_depth, glob
 
         # Plotting
         ax.scatter(xi, yi, zi, c=colors.flatten(), cmap=colormap, marker='o', alpha=0.6, vmin=global_min, vmax=global_max)
-
+        
     ax.set_xlabel('Distance from Shore (km)')
     ax.set_ylabel('Distance along transect (km)')
     ax.set_zlabel('Depth (m)')
-
     ax.set_xlim(2.5, 4.5)
-    tick_spacing = (4.5 - 2.5) / 10
-    ax.set_xticks(np.arange(2.5, 4.5 + tick_spacing, tick_spacing))
-    
     ax.set_ylim(ax.get_ylim())
     ax.set_zlim(global_max_depth, 0)
-    
-    sm = plt.cm.ScalarMappable(cmap=colormap, norm=plt.Normalize(vmin=global_min, vmax=global_max))
+    sm = plt.cm.ScalarMappable(cmap=colormap, norm=LogNorm(vmin=0.1, vmax=5.5))
     sm.set_array([])
-    cbar_ticks = np.linspace(global_min, global_max, 10)
-    cbar = plt.colorbar(sm, ax=ax, ticks=cbar_ticks) 
-    cbar.set_label(data_label)
+    cbar = plt.colorbar(sm, ax=ax, ticks=np.linspace(0, 5.5, 12)) 
+    cbar.set_label('Log10 of Chlorophyll a (µg/L)')
 
     axins = inset_axes(ax, width="30%", height="30%", loc='upper left')
     img = plt.imread(INSET_MAP)
@@ -154,13 +146,11 @@ def plot_3D_transects(file_names, global_min, global_max, global_min_depth, glob
 
 def create_gif(image_folder, gif_path, duration=1000):
     images = []
-    for file_name in sorted(os.listdir(image_folder)):
-        if file_name.endswith('.png'):
-            file_path = os.path.join(image_folder, file_name)
-            images.append(Image.open(file_path))
+    for i in range(1, 8):
+        file_path = os.path.join(image_folder, f'upto_transect_{i}.png')
+        images.append(Image.open(file_path))
 
     images[0].save(gif_path, save_all=True, append_images=images[1:], optimize=False, duration=duration, loop=0)
-    print(f"GIF saved at {gif_path}")
 
 def main():
     if not os.path.exists(SAVE_DIR):
