@@ -14,7 +14,7 @@ import matplotlib.ticker as mticker
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data')
 ACROBAT_DIR = os.path.join(DATA_DIR, 'acrobat', 'transects', 'processed')
-SATELLITE_IMAGES_DIR = os.path.join(DATA_DIR, 'sat_default', 'crops')
+SATELLITE_IMAGES_DIR = os.path.join(DATA_DIR, 'sat_default', 'crops', 'may7')
 SAVE_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'maps')
 os.makedirs(SAVE_DIR, exist_ok=True)
 
@@ -22,15 +22,9 @@ TRANSECTS = [os.path.join(ACROBAT_DIR, file) for file in os.listdir(ACROBAT_DIR)
 SATELLITE_IMGS = [file for file in os.listdir(SATELLITE_IMAGES_DIR) if file.endswith('.png')]
 
 SUBPLOT_TITLES = [
-    "RV Cape Fear, Masonboro Inlet - S3B-OLCI (120m) from May 03, 2023",
-    "RV Cape Fear, Masonboro Inlet - S3A (300m) from May 04, 2023",
-    "RV Cape Fear, Masonboro Inlet - S3B (300m) from May 06, 2023",
-    "RV Cape Fear, Masonboro Inlet - S3A (300m) from May 03, 2023",
     "RV Cape Fear, Masonboro Inlet - MODIS (1000m) from May 07, 2023",
     "RV Cape Fear, Masonboro Inlet - SeaHawk-HawkEye (120m) from May 07, 2023",
-    "RV Cape Fear, Masonboro Inlet - L8-OLI (30m) from May 03, 2023",
     "RV Cape Fear, Masonboro Inlet - S3B-OLCI 300m) from May 07, 2023",
-    "RV Cape Fear, Masonboro Inlet - SeaHawk-HawkEye (120m) from May 06, 2023",
     "RV Cape Fear, Masonboro Inlet - S3A-OLCI (300m) from May 07, 2023"
 ]
 
@@ -53,11 +47,12 @@ def load_transect_data(files):
         print(f"An error occurred while loading transect data: {e}")
         return [], pd.DataFrame()
 
-def plot_transects(ax, dfs, colors):
-    for i, df in enumerate(dfs):
+def plot_transects(ax, dfs, color='gray'):
+    """Plots transects on the given axis with the specified color."""
+    for df in dfs:
         line = LineString(list(zip(df['lon'], df['lat'])))
         gdf = gpd.GeoDataFrame([1], geometry=[line], crs="EPSG:4326")
-        gdf.plot(ax=ax, color=colors[i], linewidth=1)
+        gdf.plot(ax=ax, color=color, linewidth=1)
 
 def add_scale_bar(ax, length_km, location=(0.05, 0.25), linewidth=1, color='black', fontsize=6):
     """Adds a scale bar to a map, placed at a fraction of the axes size."""
@@ -79,8 +74,6 @@ def add_scale_bar(ax, length_km, location=(0.05, 0.25), linewidth=1, color='blac
 # -----------------
 def main():
     n_colors = len(TRANSECTS)
-    colors = sns.color_palette("dark", n_colors=n_colors)
-
     dfs, _ = load_transect_data(TRANSECTS)
 
     if not os.path.exists(SAVE_DIR):
@@ -94,7 +87,7 @@ def main():
     n_rows = (len(may_7_images) + n_cols - 1) // n_cols
 
     # Reducing figsize and dpi
-    fig, axes = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=(20, 10 * n_rows), subplot_kw={'projection': ccrs.PlateCarree()}, dpi=300)  # Adjusted figsize and dpi
+    fig, axes = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=(20, 10 * n_rows), subplot_kw={'projection': ccrs.PlateCarree()}, dpi=500)  # Adjusted figsize and dpi
     fig.patch.set_facecolor('#FAFAFA')
     axes = axes.flatten()
 
@@ -115,7 +108,7 @@ def main():
             print(f"File not found: {satellite_img_path}")
             continue
 
-        plot_transects(ax, dfs, colors)
+        plot_transects(ax, dfs, 'gray')
         ax.set_title(SUBPLOT_TITLES[i])
 
         compass_rose_image = mpimg.imread(COMPASS_ROSE_PATH)
@@ -140,7 +133,7 @@ def main():
         axes[j].axis('off')
 
     plt.subplots_adjust(wspace=0.20, hspace=0.20)
-    plt.savefig(os.path.join(SAVE_DIR, "mosaic_masonboro_may07.png"), dpi=300, bbox_inches='tight')  # Adjusted dpi
+    plt.savefig(os.path.join(SAVE_DIR, "mosaic_masonboro_may07.png"), dpi=500, bbox_inches='tight')  # Adjusted dpi
     plt.close(fig)
 
 if __name__ == '__main__':
