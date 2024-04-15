@@ -15,7 +15,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data')
 ACROBAT_DIR = os.path.join(DATA_DIR, 'acrobat', 'transects', 'processed')
 SATELLITE_IMAGES_DIR = os.path.join(DATA_DIR, 'sat_default', 'crops')
-SAVE_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'maps', 'masonboro')
+SAVE_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'maps')
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 TRANSECTS = [os.path.join(ACROBAT_DIR, file) for file in os.listdir(ACROBAT_DIR) if file.startswith('transect_') and file.endswith('.csv')]
@@ -59,20 +59,18 @@ def plot_transects(ax, dfs, colors):
         gdf = gpd.GeoDataFrame([1], geometry=[line], crs="EPSG:4326")
         gdf.plot(ax=ax, color=colors[i], linewidth=1)
 
-def draw_scale_bar(ax, location, length_km, color='black'):
-    lat, lon = location
-    length_deg = length_km / 111  # Conversion from km to degrees
-    half_length_deg = length_deg / 2  # Midpoint for the minor tick
-
-    ax.plot([lon, lon + length_deg], [lat, lat], color=color, linewidth=0.5, transform=ccrs.PlateCarree())
-
-    ax.plot([lon, lon], [lat, lat - 0.003], color=color, linewidth=0.5, transform=ccrs.PlateCarree())
-    ax.plot([lon + length_deg, lon + length_deg], [lat, lat - 0.003], color=color, linewidth=0.5, transform=ccrs.PlateCarree())
-
-    ax.plot([lon + half_length_deg, lon + half_length_deg], [lat, lat - 0.002], color=color, linewidth=0.4, transform=ccrs.PlateCarree())
-
-    ax.text(lon, lat - 0.005, "0", va='top', ha='center', fontsize=5, transform=ccrs.PlateCarree())
-    ax.text(lon + length_deg, lat - 0.005, f"{length_km} km", va='top', ha='center', fontsize=5, transform=ccrs.PlateCarree())
+def add_scale_bar(ax, length, location, linewidth=3):
+    # Get the extent of the projected map
+    x0, x1, y0, y1 = ax.get_extent()
+    # Set the length of the scale bar
+    scale_length = length / 111.32  # degrees per km at the equator (rough approximation)
+    # Set the location
+    x = x0 + (x1 - x0) * location[0]
+    y = y0 + (y1 - y0) * location[1]
+    # Draw the scale bar
+    ax.plot([x, x - scale_length], [y, y], transform=ccrs.Geodetic(), color='black', linewidth=linewidth)
+    # Label the scale bar
+    ax.text(x - scale_length / 2, y - 0.005, f'{length} km', verticalalignment='top', horizontalalignment='center', transform=ccrs.Geodetic(), color='black')
 
 # -----------------
 # MAIN FUNCTION
@@ -126,7 +124,7 @@ def main():
         ax.imshow(compass_rose_image, extent=[compass_position[0], compass_position[0] + compass_size, compass_position[1], compass_position[1] + compass_size], transform=ccrs.PlateCarree(), origin='upper')
 
         scale_bar_position = (compass_position[1] - 0.005, compass_position[0])
-        draw_scale_bar(ax, scale_bar_position, length_km=2)
+        add_scale_bar(ax, 2, location=scale_bar_position)
 
         # Set latitude and longitude tick marks
         ax.set_xticks([min_lon, max_lon], crs=ccrs.PlateCarree())
@@ -145,7 +143,7 @@ def main():
     # Adjust subplot parameters to reduce white space
     plt.subplots_adjust(wspace=-0.5, hspace=0.2)
 
-    plt.savefig(os.path.join(SAVE_DIR, "masonboro_mosaic.png"), dpi=600, bbox_inches='tight')
+    plt.savefig(os.path.join(SAVE_DIR, "mosaic_masonboro.png"), dpi=600, bbox_inches='tight')
     plt.close(fig)
 
 if __name__ == '__main__':

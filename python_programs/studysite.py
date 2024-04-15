@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import matplotlib.image as mpimg
-import geopandas as gpd
 import os
 from cartopy.io.shapereader import Reader
 from cartopy.feature import ShapelyFeature
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
+from matplotlib.colors import LinearSegmentedColormap, BoundaryNorm
 
 # Setup the base directories
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -19,14 +19,20 @@ os.environ["CARTOPY_DATA_DIR"] = NATURAL_EARTH_DIR
 STUDY_SITE_LON = -77.696587
 STUDY_SITE_LAT = 34.193111
 
-def draw_scale_bar(ax, location, length_km, color='black'):
-    lat, lon = location
-    length_deg = length_km / 111  # Conversion from km to degrees
-    ax.plot([lon, lon + length_deg], [lat, lat], color=color, linewidth=0.5, transform=ccrs.PlateCarree())
-    ax.plot([lon, lon], [lat, lat - 0.003], color=color, linewidth=0.5, transform=ccrs.PlateCarree())
-    ax.plot([lon + length_deg, lon + length_deg], [lat, lat - 0.003], color=color, linewidth=0.5, transform=ccrs.PlateCarree())
-    ax.text(lon, lat - 0.005, "0", va='top', ha='center', fontsize=5, transform=ccrs.PlateCarree())
-    ax.text(lon + length_deg, lat - 0.005, f"{length_km} km", va='top', ha='center', fontsize=5, transform=ccrs.PlateCarree())
+def add_scale_bar(ax, length_km, location=(0.05, 0.25), linewidth=1, color='black', fontsize=6):
+    """Adds a scale bar to a map, placed at a fraction of the axes size."""
+    # Convert length in kilometers to degrees (approximation)
+    length_deg = length_km / 111.32  # Rough conversion factor for degrees to kilometers at the equator
+
+    # Get axes size and compute position in degrees
+    x0, x1, y0, y1 = ax.get_extent()
+    x = x0 + (x1 - x0) * location[0]
+    y = y0 + (y1 - y0) * location[1]
+
+    # Draw the scale bar
+    ax.plot([x, x + length_deg], [y, y], transform=ccrs.Geodetic(), color=color, linewidth=linewidth)
+    # Label the scale bar
+    ax.text(x + length_deg / 2, y - 0.05, f'{length_km} km', verticalalignment='top', horizontalalignment='center', transform=ccrs.Geodetic(), color=color, fontsize=fontsize)
 
 def set_map_extent(ax, width_in_degrees, height_in_degrees):
     min_lon = STUDY_SITE_LON - width_in_degrees / 2
@@ -35,32 +41,39 @@ def set_map_extent(ax, width_in_degrees, height_in_degrees):
     max_lat = STUDY_SITE_LAT + height_in_degrees / 2
     ax.set_extent([min_lon, max_lon, min_lat, max_lat])
 
-def draw_scale_bar(ax, location, length_km, color='black'):
-    lat, lon = location
-    length_deg = length_km / 111  # Conversion from km to degrees
-    half_length_deg = length_deg / 2  # Midpoint for the minor tick
-
-    ax.plot([lon, lon + length_deg], [lat, lat], color=color, linewidth=0.5, transform=ccrs.PlateCarree())
-
-    ax.plot([lon, lon], [lat, lat - 0.003], color=color, linewidth=0.5, transform=ccrs.PlateCarree())
-    ax.plot([lon + length_deg, lon + length_deg], [lat, lat - 0.003], color=color, linewidth=0.5, transform=ccrs.PlateCarree())
-
-    ax.plot([lon + half_length_deg, lon + half_length_deg], [lat, lat - 0.002], color=color, linewidth=0.4, transform=ccrs.PlateCarree())
-
-    ax.text(lon, lat - 0.005, "0", va='top', ha='center', fontsize=5, transform=ccrs.PlateCarree())
-    ax.text(lon + length_deg, lat - 0.005, f"{length_km} km", va='top', ha='center', fontsize=5, transform=ccrs.PlateCarree())
-
 def plot_study_site():
     fig, ax = plt.subplots(figsize=(10, 6), subplot_kw={'projection': ccrs.PlateCarree()})
     ax.set_extent([STUDY_SITE_LON - 5, STUDY_SITE_LON + 5, STUDY_SITE_LAT - 5, STUDY_SITE_LAT + 5])
+    
+    compass_rose_image = mpimg.imread(COMPASS_ROSE_PATH)
+    x0, x1, y0, y1 = ax.get_extent()
+    compass_width = (x1 - x0) * 0.1
+    compass_height = (y1 - y0) * 0.1
+    compass_x = x0 + compass_width * 0.75
+    compass_y = y1 - compass_height * 0.75
+    ax.imshow(compass_rose_image, extent=[compass_x - compass_width / 2, compass_x + compass_width / 2, compass_y - compass_height / 2, compass_y + compass_height / 2], transform=ccrs.PlateCarree(), zorder=10)
+    
+    add_scale_bar(ax, 100, location=(0.05, 0.05), color='black', fontsize=6)  # Placing the bar at 5% from the left and bottom of the map
 
-    # Define feature types and associated colors for coastline, land, and new layers
     feature_types = {
         'coastline': 'none',
         'land': '#c8c365',  # Land color
         'geography_marine_polys': '#a6cee3',  # Light blue for marine areas
         'geography_regions_polys': '#bdbdbd'  # Grey for geographic regions
     }
+
+
+    # Create custom colormap
+    colors = ['#f7fbff', '#deebf7', '#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#08519c']
+    levels = [0, 200, 1000, 2000, 3000, 4000, 5000, 6000]
+    cmap = LinearSegmentedColormap.from_list('bathymetry', colors, N=len(levels))
+    norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
+
+    # Add color bar
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])  # This is necessary because our data is not on a regular grid.
+    cb = plt.colorbar(sm, ax=ax, boundaries=levels, ticks=levels)
+    cb.set_label('Depth (m)')
 
     # Load non-bathymetry features including new geography layers
     for feature_name in ['coastline', 'land', 'geography_marine_polys', 'geography_regions_polys']:
@@ -75,20 +88,19 @@ def plot_study_site():
             print(f"Failed to load {feature_name}: {e}")
 
     # Bathymetry colors and files setup
-    bathymetry_colors = [
-        '#f7fbff', '#deebf7', '#c6dbef', '#9ecae1', '#6baed6',
-        '#4292c6', '#2171b5', '#08519c', '#08306b', '#042040',
-        '#02132c', '#010b17'
-    ]
-    bathymetry_files = [
-        'ne_10m_bathymetry_L_0', 'ne_10m_bathymetry_K_200', 'ne_10m_bathymetry_J_1000',
-        'ne_10m_bathymetry_I_2000', 'ne_10m_bathymetry_H_3000', 'ne_10m_bathymetry_G_4000',
-        'ne_10m_bathymetry_F_5000', 'ne_10m_bathymetry_E_6000', 'ne_10m_bathymetry_D_7000',
-        'ne_10m_bathymetry_C_8000', 'ne_10m_bathymetry_B_9000', 'ne_10m_bathymetry_A_10000'
+    bathymetry_data = [
+        ('ne_10m_bathymetry_L_0', '#f7fbff', '0m'),
+        ('ne_10m_bathymetry_K_200', '#deebf7', '200m'),
+        ('ne_10m_bathymetry_J_1000', '#c6dbef', '1000m'),
+        ('ne_10m_bathymetry_I_2000', '#9ecae1', '2000m'),
+        ('ne_10m_bathymetry_H_3000', '#6baed6', '3000m'),
+        ('ne_10m_bathymetry_G_4000', '#4292c6', '4000m'),
+        ('ne_10m_bathymetry_F_5000', '#2171b5', '5000m'),
+        ('ne_10m_bathymetry_E_6000', '#08519c', '6000m')
     ]
 
     # Load bathymetry files
-    for file_name, color in zip(bathymetry_files, bathymetry_colors):
+    for file_name, color, label in bathymetry_data:
         shapefile_path = os.path.join(NATURAL_EARTH_DIR, 'ne_10m_bathymetry_all', f'{file_name}.shp')
         try:
             shape_feature = ShapelyFeature(Reader(shapefile_path).geometries(),
@@ -101,12 +113,8 @@ def plot_study_site():
 
     # Additional map setup
     plt.plot(STUDY_SITE_LON, STUDY_SITE_LAT, 'ro', transform=ccrs.PlateCarree(), label="R/V Cape Fear cruises")
-    plt.legend(loc='lower right')
+    plt.legend(loc='lower right', fontsize=8)
     plt.title("RV Cape Fear, May 03-05 2023, Wilmington, NC")
-    compass_rose_image = mpimg.imread(COMPASS_ROSE_PATH)
-    ax.imshow(compass_rose_image, extent=[STUDY_SITE_LON - 4.5, STUDY_SITE_LON - 3.0, STUDY_SITE_LAT + 3.0, STUDY_SITE_LAT + 4.5], transform=ccrs.PlateCarree(), zorder=10)
-
-    draw_scale_bar(ax, (STUDY_SITE_LAT + 2.75, STUDY_SITE_LON - 4.25), 100, color='black')  # 100 km scale bar
 
     gl = ax.gridlines(draw_labels=True, linewidth=1, color='gray', alpha=0.5, linestyle='--')
     gl.top_labels = False
