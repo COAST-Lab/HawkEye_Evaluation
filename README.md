@@ -14,7 +14,7 @@ Field missions will gather in-situ data, utilizing instruments capable of vertic
 
 ![Map of Transects at Masonboro Inlet](images/studysite.png "Map of the 7 transects at the mouth of Masonboro Inlet for in situ chlorophyll measurements.")
 
-![seven in situ transects](images/chlor_a_gradient.gif "GIF displaying the depth contours of the 7 transects' chlorophyll measurements.")
+![seven in situ transects](images/chl.gif "GIF displaying the depth contours of the 7 transects' chlorophyll measurements.")
 
 ![mosaic of satellite chlorophyll measurements](images/mosaic_masonboro_may07.png "Satellite-derived chlorophyll measurements in the study region.")  
 
