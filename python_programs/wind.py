@@ -18,8 +18,8 @@ if not os.path.exists(SAVE_DIR):
 lat_south, lon_west, lat_north, lon_east = 33.80, -78.05, 34.40, -77.45
 
 time_windows = [
-    ('2023-05-03T08:00:00', '2023-05-03T20:00:00'),
-    ('2023-05-04T08:00:00', '2023-05-04T20:00:00'),
+    #('2023-05-03T08:00:00', '2023-05-03T20:00:00'),
+    #('2023-05-04T08:00:00', '2023-05-04T20:00:00'),
     ('2023-05-05T08:00:00', '2023-05-05T20:00:00'),
     ('2023-05-06T08:00:00', '2023-05-06T20:00:00'),
     ('2023-05-07T08:00:00', '2023-05-07T20:00:00')
@@ -39,6 +39,7 @@ with xr.open_dataset(WIND_DIR) as ncw:
 
         global_min = min(global_min, min_wind_speed)
         global_max = max(global_max, max_wind_speed)
+        print(f"Global minimum: {global_min}, Global maximum: {global_max}")
 
     for start, end in time_windows:
         time_slice = ncw.sel(time=slice(start, end)).mean('time')
@@ -77,9 +78,12 @@ with xr.open_dataset(WIND_DIR) as ncw:
                                    vmin=global_min, 
                                    vmax=global_max)
 
-        plt.colorbar(speed_plot, ax=ax, orientation='vertical', label='Wind speed (m/s)')
+        #plt.colorbar(speed_plot, ax=ax, orientation='vertical', label='Wind speed (m/s)')
         ax.quiver(lon_np, lat_np, u_np, v_np, color='black', transform=ccrs.PlateCarree())
 
+        # Setting x and y labels
+        #ax.set_xlabel('Longitude', fontsize=12)
+        #ax.set_ylabel('Latitude', fontsize=12)
         xticks = np.arange(lon_west, lon_east, 0.1)
         yticks = np.arange(lat_south, lat_north, 0.1)
         ax.set_xticks(xticks, crs=ccrs.PlateCarree())
@@ -92,12 +96,12 @@ with xr.open_dataset(WIND_DIR) as ncw:
         end_time = pd.to_datetime(end)
         start_time_str_title = start_time.strftime('%B %d, %Y %H:%M')
         end_time_str_title = end_time.strftime('%B %d, %Y %H:%M')
-        ax.set_title(f"Average Wind Vectors: {start_time_str_title} - {end_time_str_title}")
+        ax.set_title(f"{start_time_str_title} - {end_time_str_title}")
 
         start_time_str_filename = start_time.strftime('%Y%m%d%H%M')
         end_time_str_filename = end_time.strftime('%Y%m%d%H%M')
         filename = f"wind_vector_{start_time_str_filename}_to_{end_time_str_filename}.png"
         save_path = os.path.join(SAVE_DIR, filename)
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.savefig(save_path, dpi=500, bbox_inches='tight')
         plt.close(fig)
         print(f"Saved plot to {save_path}")

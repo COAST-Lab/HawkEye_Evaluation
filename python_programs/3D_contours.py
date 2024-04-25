@@ -12,7 +12,7 @@ from tqdm import tqdm
 from PIL import Image
 
 INTERPOLATION_METHOD = 'linear' # linear, cubic, nearest
-DATA_TYPE = 'chlor_a'  # options are 'temp', 'salinity', 'density', 'turbidity', 'cdom', 'chlor_a', 'ox_sat'
+DATA_TYPE = 'ox_sat'  # options are 'temp', 'salinity', 'density', 'turbidity', 'cdom', 'chlor_a', 'ox_sat'
 EARTH_RADIUS = 6371  # in kilometers
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -30,7 +30,7 @@ colormap_and_label = {
     'turbidity': (cmocean.cm.turbid, 'Turbidity (NTU)'),
     'cdom': (cmocean.cm.matter, 'CDOM'),
     'chlor_a': (cmocean.cm.algae, 'Chlorophyll a (µg/L)'),
-    'ox_sat': (cmocean.cm.oxy, 'Oxygen Saturation (%)')
+    'ox_sat': (cmocean.cm.deep, 'Oxygen Saturation (%)')
 }
 
 def haversine(lon1, lat1, lon2, lat2):
@@ -49,7 +49,6 @@ def get_global_min_max(file_names):
     global_max = []
     global_min_depth = []
     global_max_depth = []
-
     
     print(f"Processing global min/max {DATA_TYPE} values and depth...")
     for fname in tqdm(file_names):
@@ -72,7 +71,7 @@ def plot_3D_transects(file_names, global_min, global_max, global_min_depth, glob
     global_min = global_min_values[DATA_TYPE]
     global_max = global_max_values[DATA_TYPE]
 
-    fig = plt.figure(figsize=(12, 10))
+    fig = plt.figure(figsize=(18, 18))
     ax = fig.add_subplot(111, projection='3d')
     
     distances_from_shore = []
@@ -123,34 +122,42 @@ def plot_3D_transects(file_names, global_min, global_max, global_min_depth, glob
         # Plotting
         ax.scatter(xi, yi, zi, c=colors.flatten(), cmap=colormap, marker='o', alpha=0.6, vmin=global_min, vmax=global_max)
 
-    ax.set_xlabel('Distance from Shore (km)')
-    ax.set_ylabel('Distance along transect (km)')
-    ax.set_zlabel('Depth (m)')
+    label_fontsize = 20
+    labelpad = 20  # Adjust this value as needed to increase the space between labels and ticks
+
+    ax.set_xlabel('Distance from Shore (km)', fontsize=label_fontsize, labelpad=labelpad)
+    ax.set_ylabel('Distance along transect (km)', fontsize=label_fontsize, labelpad=labelpad)
+    ax.set_zlabel('Depth (m)', fontsize=label_fontsize, labelpad=labelpad)
+
+    # Adjust tick padding to prevent overlap with tick labels
+    ax.tick_params(axis='x', which='major', labelsize=label_fontsize, pad=10)  # pad for x-axis ticks
+    ax.tick_params(axis='y', which='major', labelsize=label_fontsize, pad=10)  # pad for y-axis ticks
+    ax.tick_params(axis='z', which='major', labelsize=label_fontsize, pad=10)  # pad for z-axis ticks
 
     ax.set_xlim(2.5, 4.5)
     tick_spacing = (4.5 - 2.5) / 10
     ax.set_xticks(np.arange(2.5, 4.5 + tick_spacing, tick_spacing))
-    
+
     ax.set_ylim(ax.get_ylim())
     ax.set_zlim(global_max_depth, 0)
     
-    sm = plt.cm.ScalarMappable(cmap=colormap, norm=plt.Normalize(vmin=global_min, vmax=global_max))
-    sm.set_array([])
-    cbar_ticks = np.linspace(global_min, global_max, 10)
-    cbar = plt.colorbar(sm, ax=ax, ticks=cbar_ticks) 
-    cbar.set_label(data_label)
+    #sm = plt.cm.ScalarMappable(cmap=colormap, norm=plt.Normalize(vmin=global_min, vmax=global_max))
+    #sm.set_array([])
+    #cbar_ticks = np.linspace(global_min, global_max, 10)
+    #cbar = plt.colorbar(sm, ax=ax, ticks=cbar_ticks) 
+    #cbar.set_label(data_label)
 
-    axins = inset_axes(ax, width="30%", height="30%", loc='upper left')
-    img = plt.imread(INSET_MAP)
-    axins.imshow(img)
-    axins.axis('off')
+    #axins = inset_axes(ax, width="30%", height="30%", loc='upper left')
+    #img = plt.imread(INSET_MAP)
+    #axins.imshow(img)
+    #axins.axis('off')
 
     if not os.path.exists(SAVE_DIR):
         os.makedirs(SAVE_DIR)
-    # Save the combined visualization for the current state
     combined_save_path = f"{SAVE_DIR}/upto_transect_{upto_idx + 1}.png"
+    plt.tight_layout()
     plt.savefig(combined_save_path, dpi=300)
-    plt.close()  # Close the figure to free up memory
+    plt.close()
 
 def create_gif(image_folder, gif_path, duration=1000):
     images = []

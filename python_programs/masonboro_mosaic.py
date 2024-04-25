@@ -14,7 +14,7 @@ import matplotlib.ticker as mticker
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data')
 ACROBAT_DIR = os.path.join(DATA_DIR, 'acrobat', 'transects', 'processed')
-SATELLITE_IMAGES_DIR = os.path.join(DATA_DIR, 'sat_default', 'crops')
+SATELLITE_IMAGES_DIR = os.path.join(DATA_DIR, 'sat_default', 'crops', 'chlor_a')
 SAVE_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'maps')
 os.makedirs(SAVE_DIR, exist_ok=True)
 

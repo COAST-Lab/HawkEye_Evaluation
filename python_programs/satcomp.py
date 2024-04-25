@@ -77,13 +77,20 @@ def main():
      # Calculate the difference between the two satellite datasets
     difference = calculate_difference(s3a_chlor_a, s3b_chlor_a)
     
+    extreme_swing = np.nanmax(np.abs(difference))
+    print(f"Most extreme chlorophyll change observed: {extreme_swing:.2f} µg/L")
+
+    # Calculate and print the average day-to-day chlorophyll change
+    average_change = np.nanmean(difference)
+    print(f"Average day-to-day chlorophyll change: {average_change:.2f} µg/L")
+
     # Plotting
     fig, ax = plt.subplots(figsize=(10, 8), subplot_kw={'projection': ccrs.PlateCarree()})
     ax.set_extent([lon_west, lon_east, lat_south, lat_north], crs=ccrs.PlateCarree())
 
     # Set the figure and axes background color
-    fig.patch.set_facecolor('#FAFAFA')
-    ax.patch.set_facecolor('#FAFAFA')  # Sets the plot background color
+    fig.patch.set_facecolor('#FFFFFF')
+    ax.patch.set_facecolor('#FFFFFF')  # Sets the plot background color
 
     # Adding geographical features with specified facecolor for land and ocean
     feature = cfeat.GSHHSFeature(scale='full', levels=[1], facecolor='gray', edgecolor='black')
@@ -107,8 +114,8 @@ def main():
     ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: longitude_formatter(x)))
     ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: latitude_formatter(y)))
     
-    plt.title('Day-to-Day Chlorophyll-a Change (May 6 - May 7)', fontsize=14)
-    plt.savefig(OUTPUT_PATH, dpi=300, bbox_inches='tight')
+    plt.title('24-Hour Chlorophyll-a Change (May 6 - May 7)', fontsize=14)
+    plt.savefig(OUTPUT_PATH, dpi=500, bbox_inches='tight')
 
 if __name__ == "__main__":
     main()

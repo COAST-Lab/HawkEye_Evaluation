@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from matplotlib.colors import Normalize
+from matplotlib.colors import Normalize, LogNorm
 import numpy as np
 import cmocean
 import os
@@ -9,52 +9,87 @@ SAVE_DIR = os.path.join(SCRIPT_DIR, 'local_processing_resources')
 if not os.path.exists(SAVE_DIR):
     os.makedirs(SAVE_DIR)
 
-def create_colorbar(orientation='horizontal', title_size=12):  # Add title_size parameter with default value
-    # Set figure size based on orientation
-    fig_size = (12, 0.5) if orientation == 'horizontal' else (0.5, 12)
+variable_properties = {
+    'ox_sat': {
+        'cmap': cmocean.cm.deep,  # Colormap for oxygen saturation
+        'norm': Normalize(vmin=7.36524, vmax=7.45626),  # Normalization range for oxygen saturation
+        'tick_values': np.linspace(7.36524, 7.45626, 7),  # Tick values for the colorbar
+        'label_text': 'Oxygen Saturation (%)'  # Label for the colorbar
+    },
+    'turbidity': {
+        'cmap': cmocean.cm.turbid,  # Colormap for turbidity
+        'norm': Normalize(vmin=0.0, vmax=10.986),  # Normalization range for turbidity
+        'tick_values': np.linspace(0.0, 10.986, 7),  # Tick values for the colorbar
+        'label_text': 'Turbidity (NTU)'  # Label for the colorbar
+    },
+    'density': {
+        'cmap': cmocean.cm.dense,  # Colormap for density
+        'norm': Normalize(vmin=1024.6705, vmax=1024.9357),  # Normalization range for density
+        'tick_values': np.linspace(1024.6705, 1024.9357, 7),  # Tick values for the colorbar
+        'label_text': 'Density (kg/m³)'  # Label for the colorbar
+    },
+    'salinity': {
+        'cmap': cmocean.cm.haline,  # Colormap for salinity
+        'norm': Normalize(vmin=34.9221, vmax=35.0453),  # Normalization range for salinity
+        'tick_values': np.linspace(34.9221, 35.0453, 7),  # Tick values for the colorbar
+        'label_text': 'Salinity (PSU)'  # Label for the colorbar
+    },
+    'temp': {
+        'cmap': cmocean.cm.thermal,  # Colormap for temperature
+        'norm': Normalize(vmin=19.548, vmax=20.2196),  # Normalization range for temperature
+        'tick_values': np.linspace(19.548, 20.2196, 7),  # Tick values for the colorbar
+        'label_text': 'Temperature (°C)'  # Label for the colorbar
+    },
+    'wind': {
+        'cmap': plt.cm.viridis,
+        'norm': Normalize(vmin=0.02621171437203884, vmax=9.460841178894043),
+        'tick_values': np.linspace(0.02621171437203884, 9.460841178894043, 7),
+        'label_text': 'Wind Speed (m/s)'
+    },
+    'kd490': {
+        'cmap':  plt.cm.viridis,
+        'norm': Normalize(vmin=0.01, vmax=0.20),
+        'tick_values': np.linspace(0.01, 0.20, 7),
+        'label_text': 'Kd490 (m−1)'
+    },
+    'chlor_a': {
+        'cmap': cmocean.cm.algae,
+        'norm': LogNorm(vmin=0.1, vmax=5.5),
+        'tick_values': np.logspace(np.log10(0.1), np.log10(5.5), num=7),
+        'label_text': 'Chlorophyll a (µg/L)'
+    }
+}
+
+def create_colorbar(variable, orientation='horizontal', title_size=12, use_log_scale=False):
+    props = variable_properties[variable]
+    fig_size = (10, 0.5) if orientation == 'horizontal' else (0.5, 12)
+    fig, ax = plt.subplots(figsize=fig_size)
     
-    # Create a figure and a single subplot with a facecolor of #FAFAFA
-    fig, ax = plt.subplots(figsize=fig_size) #facecolor='#FAFAFA'
-
-    # Set the colormap
-    cmap = plt.cm.Greens
-
-    # Define the bounds for the normalization using a logarithmic scale
-    norm = Normalize(vmin=np.log10(0.1), vmax=np.log10(5.5))
-
-    # Create a ScalarMappable and initialize a data array with the scalar data to map
+    cmap = props['cmap']
+    norm = props['norm']
+    
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
 
-    # Create the colorbar with logarithmic ticks
-    cbar = plt.colorbar(sm, cax=ax, orientation=orientation, 
-                        aspect=10)  # aspect makes the colorbar thinner
-    cbar.set_ticks(np.log10([0.1, 0.2, 0.5, 1.0, 2.0, 5.0]))
-    cbar.set_ticklabels(['0.1', '0.2', '0.5', '1.0', '2.0', '5.0'])
+    cbar = plt.colorbar(sm, cax=ax, orientation=orientation, aspect=10)
+    cbar.set_ticks(props['tick_values'])
+    cbar.set_ticklabels(['{:.2f}'.format(tick) for tick in props['tick_values']])
+    cbar.ax.tick_params(labelsize=title_size)
 
-    # Set the colorbar label with adjustments for horizontal and vertical orientation and apply the title_size
+    label_text = props['label_text']
     if orientation == 'horizontal':
-        cbar.set_label('Chlorophyll (µg/L)', rotation=0, labelpad=10, fontsize=title_size)
+        cbar.set_label(label_text, rotation=0, labelpad=10, fontsize=title_size)
         cbar.ax.xaxis.set_label_position('bottom')
     else:
-        cbar.set_label('Chlorophyll (µg/L)', rotation=90, labelpad=10, fontsize=title_size)
-
-    # Set the tick labels size
-    cbar.ax.tick_params(labelsize=12)
-
-    # Set the background color of the colorbar to #FAFAFA
-    #cbar.ax.set_facecolor('#FAFAFA')
-
-    # Save the colorbar to a file with a #FAFAFA background
-    colorbar_path = os.path.join(SAVE_DIR, f'colorbar_{orientation}.png')
-    plt.savefig(colorbar_path, dpi=300, bbox_inches='tight') #facecolor='#FAFAFA')
+        cbar.set_label(label_text, rotation=90, labelpad=10, fontsize=title_size)
+    
+    colorbar_path = os.path.join(SAVE_DIR, f'{variable}_{orientation}.png')
+    plt.savefig(colorbar_path, dpi=500, bbox_inches='tight')
     print("Saving colorbar at:", colorbar_path)
-
-    # Close the plot to avoid displaying it in the notebook output
     plt.close()
 
     return colorbar_path
 
-# Usage with adjustable title size
-horizontal_colorbar_path = create_colorbar('horizontal', title_size=16)
-vertical_colorbar_path = create_colorbar('vertical', title_size=16)
+# Example Usage
+horizontal_colorbar_path_log = create_colorbar('chlor_a', 'horizontal', title_size=16, use_log_scale=True)
+vertical_colorbar_path_normal = create_colorbar('chlor_a', 'vertical', title_size=16, use_log_scale=True)

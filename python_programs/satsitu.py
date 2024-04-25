@@ -9,7 +9,7 @@ import warnings
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data')
 ACROBAT_DIR = os.path.join(DATA_DIR, 'acrobat', 'transects', 'processed')
-SATELLITE_DIR = os.path.join(DATA_DIR, 'sat_default')
+SATELLITE_DIR = os.path.join(DATA_DIR, 'sat_default', 'all_l2')
 
 acrobat_fname = os.path.join(ACROBAT_DIR, 'processed_dataset.csv')
 output_acrobat_fname = os.path.join(DATA_DIR, 'satsitu', 'satsitu_l2.csv')
@@ -21,11 +21,11 @@ warnings.filterwarnings('ignore', category=UserWarning)
 
 # Define satellite directories
 satellite_dirs = {
-    'hawkeye': os.path.join(SATELLITE_DIR, 'hawkeye', 'l2'),
-    'modisa': os.path.join(SATELLITE_DIR, 'modisa', 'l2'),
-    's3b': os.path.join(SATELLITE_DIR, 's3b', 'l2'),
-    's3a': os.path.join(SATELLITE_DIR, 's3a', 'l2'),
-    'landsat': os.path.join(SATELLITE_DIR, 'landsat', 'l2')
+    'hawkeye': os.path.join(SATELLITE_DIR),
+    'modisa': os.path.join(SATELLITE_DIR),
+    's3b': os.path.join(SATELLITE_DIR),
+    's3a': os.path.join(SATELLITE_DIR),
+    #'landsat': os.path.join(SATELLITE_DIR, 'landsat', 'l2')
 }
 
 def read_product_netCDF4(file_path, product_name, group_name):

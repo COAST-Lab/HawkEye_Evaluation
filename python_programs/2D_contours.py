@@ -11,7 +11,7 @@ from matplotlib.ticker import FormatStrFormatter
 from matplotlib.colors import LogNorm
 
 INTERPOLATION_METHOD = 'linear'     # options are linear, cubic, or nearest.
-DATA_TYPE = 'chlor_a'               # options are temp, salinity, density, turbidity, cdom, chlor_a, ox_sat.
+DATA_TYPE = 'ox_sat'               # options are temp, salinity, density, turbidity, cdom, chlor_a, ox_sat.
 
 SHOW_TRANSECT_TITLE = True          # Set to False to hide transect titles.
 SHOW_AXES_TITLES = True             # Set to False to hide axes titles.
@@ -44,7 +44,7 @@ SAVE_DIR = os.path.join(SCRIPT_DIR, '..', f'visualization', 'contour_plots', 'wb
 if not ENABLE_INTERPOLATION:
     SAVE_DIR = os.path.join(SCRIPT_DIR, '..', f'visualization', 'contour_plots', 'wb', DATA_TYPE, '2D_plots', 'contours')
 
-BATHYMETRY_PATH = os.path.join(SCRIPT_DIR, 'local_processing_resources','bathymetry','gebco_2023_n34.5_s33.75_w-78.0_e-77.3.tif')
+BATHYMETRY_PATH = os.path.join(SCRIPT_DIR, 'local_processing_resources', 'bathymetry', 'gebco_2023_n34.5_s33.75_w-78.0_e-77.3.tif')
 
 NUM_CONTOUR_LEVELS = 100  # Number of contour levels in the plot
 EARTH_RADIUS = 6371  # in kilometers
@@ -59,19 +59,26 @@ def haversine(lon1, lat1, lon2, lat2):
     return c * EARTH_RADIUS
 
 def get_global_min_max(file_names):
-    # Function to get the global min and max values from all the files for the specified data type.
     all_mins = []
     all_maxs = []
 
     for fname in tqdm(file_names):
         try:
             data = pd.read_csv(fname)
-            all_mins.append(data[DATA_TYPE].min())
-            all_maxs.append(data[DATA_TYPE].max())
+            if DATA_TYPE in data.columns:
+                all_mins.append(data[DATA_TYPE].min())
+                all_maxs.append(data[DATA_TYPE].max())
+            else:
+                print(f"Warning: Column '{DATA_TYPE}' not found in {fname}. Available columns: {data.columns.tolist()}")
         except Exception as e:
             print(f"Error processing file {fname}: {e}")
 
+    if not all_mins or not all_maxs:  # Check if lists are empty
+        print("No valid data found. Check the column names and file contents.")
+        return None, None  # Return None or handle accordingly
+
     return min(all_mins), max(all_maxs)
+
 
 def load_bathymetry(file_path):
     # Load bathymetry data from a GeoTIFF file
@@ -141,14 +148,14 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
             colormap = cmocean.cm.matter
             data_label = 'CDOM'
         elif DATA_TYPE == 'chlor_a':
-            colormap = plt.cm.Greens
+            colormap = cmocean.cm.algae
             data_label = 'Chlorophyll a (µg/L)'
             # Define fixed_min and fixed_max for chlorophyll a visualization
             fixed_min = 0.1  # Minimum value for the color scale
             fixed_max = 5.5  # Maximum value for the color scale
             norm = LogNorm(vmin=fixed_min, vmax=fixed_max)  # Using LogNorm for chlor_a
         elif DATA_TYPE == 'ox_sat':
-            colormap = cmocean.cm.oxy
+            colormap = cmocean.cm.deep
             data_label = 'Oxygen Saturation (%)'
         else:
             colormap = cmocean.cm.haline  # Default colormap
@@ -171,8 +178,8 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 
         # Set the background color of the figure and axes
-        fig.patch.set_facecolor('#FAFAFA')  # Set the figure's background color
-        ax.set_facecolor('#FAFAFA')  # Set the axes' background color
+        fig.patch.set_facecolor('#FFFFFF')  # Set the figure's background color
+        ax.set_facecolor('#FFFFFF')  # Set the axes' background color
 
         if ENABLE_INTERPOLATION:
             # Interpolation of the data

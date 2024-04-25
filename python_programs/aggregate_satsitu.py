@@ -10,7 +10,7 @@ DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu', 'satsitu_l2.c
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu')
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
-output_filename = os.path.join(OUTPUT_DIR, 'combined_aggregated_satsitu_data_l2_2.csv')
+output_filename = os.path.join(OUTPUT_DIR, 'aggregated_satsitu_data_l2.csv')
 
 df = pd.read_csv(DATA_DIR)
 
@@ -18,7 +18,7 @@ df = pd.read_csv(DATA_DIR)
 sensor_identifiers = set(col.rsplit('_', 1)[0] for col in df.columns if 'irow' in col)
 
 # Specify the depth ranges
-depth_ranges = [(0, 3), (4, 6), (7, 10), (0, 10), (0, 5), (5, 10)]
+depth_ranges = [(0, 2), (2, 4), (4, 6), (6, 8), (8, 10), (0, 10), (0, 5), (5, 10), (0, 4), (4, 7), (7, 10)]
 
 # Suppress warnings related to mean of empty slices and DataFrame fragmentation
 warnings.filterwarnings('ignore', category=RuntimeWarning)

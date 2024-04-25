@@ -19,19 +19,13 @@ os.environ["CARTOPY_DATA_DIR"] = NATURAL_EARTH_DIR
 STUDY_SITE_LON = -77.696587
 STUDY_SITE_LAT = 34.193111
 
-def add_scale_bar(ax, length_km, location=(0.05, 0.25), linewidth=1, color='black', fontsize=6):
-    """Adds a scale bar to a map, placed at a fraction of the axes size."""
+def add_scale_bar(ax, length_km, location=(0.940, 0.075), linewidth=1, color='black', fontsize=6):
     # Convert length in kilometers to degrees (approximation)
-    length_deg = length_km / 111.32  # Rough conversion factor for degrees to kilometers at the equator
-
-    # Get axes size and compute position in degrees
+    length_deg = length_km / 111.32
     x0, x1, y0, y1 = ax.get_extent()
     x = x0 + (x1 - x0) * location[0]
     y = y0 + (y1 - y0) * location[1]
-
-    # Draw the scale bar
     ax.plot([x, x + length_deg], [y, y], transform=ccrs.Geodetic(), color=color, linewidth=linewidth)
-    # Label the scale bar
     ax.text(x + length_deg / 2, y - 0.05, f'{length_km} km', verticalalignment='top', horizontalalignment='center', transform=ccrs.Geodetic(), color=color, fontsize=fontsize)
 
 def set_map_extent(ax, width_in_degrees, height_in_degrees):
@@ -49,11 +43,11 @@ def plot_study_site():
     x0, x1, y0, y1 = ax.get_extent()
     compass_width = (x1 - x0) * 0.1
     compass_height = (y1 - y0) * 0.1
-    compass_x = x0 + compass_width * 0.75
+    compass_x = x1 - compass_width * 0.75
     compass_y = y1 - compass_height * 0.75
     ax.imshow(compass_rose_image, extent=[compass_x - compass_width / 2, compass_x + compass_width / 2, compass_y - compass_height / 2, compass_y + compass_height / 2], transform=ccrs.PlateCarree(), zorder=10)
     
-    add_scale_bar(ax, 100, location=(0.05, 0.05), color='black', fontsize=6)  # Placing the bar at 5% from the left and bottom of the map
+    add_scale_bar(ax, 100, location=(0.85, 0.05), color='black', fontsize=6)  # Placing the bar at 5% from the left and bottom of the map
 
     feature_types = {
         'coastline': 'none',
@@ -113,8 +107,8 @@ def plot_study_site():
 
     # Additional map setup
     plt.plot(STUDY_SITE_LON, STUDY_SITE_LAT, 'ro', transform=ccrs.PlateCarree(), label="R/V Cape Fear cruises")
-    plt.legend(loc='lower right', fontsize=8)
-    plt.title("RV Cape Fear, May 03-05 2023, Wilmington, NC")
+    plt.legend(loc='upper left', fontsize=8)
+    plt.title("R/V Cape Fear, May 03-05 2023, Wilmington, NC")
 
     gl = ax.gridlines(draw_labels=True, linewidth=1, color='gray', alpha=0.5, linestyle='--')
     gl.top_labels = False
@@ -124,7 +118,7 @@ def plot_study_site():
 
     plt.xlabel("Longitude")
     plt.ylabel("Latitude")
-    plt.savefig(SAVE_PATH, dpi=300, bbox_inches='tight')
+    plt.savefig(SAVE_PATH, dpi=500, bbox_inches='tight')
     print(f"Map of study site plotted and saved to {SAVE_PATH}.")
 
 if __name__ == "__main__":
