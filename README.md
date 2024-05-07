@@ -25,10 +25,11 @@ Initial findings highlight the potential of HawkEye in providing high-resolution
 The project will continue with the analysis of collected data, matchup analysis, and the synthesis of findings. Results will be disseminated through academic publications, aiming to contribute valuable insights into OC remote sensing and its application in marine conservation.
 
 ## Contact
-Mitchell D. Torkelson    
-University of North Carolina Wilmington    
-Center for Marine Science   
-E: mdt3971@uncw.edu  
+Mitchell D. Torkelson  
+University of North Carolina Wilmington  
+Center for Marine Science  
+**Email:** [mdt3971@uncw.edu](mailto:mdt3971@uncw.edu)  
+**Portfolio:** [Mitch Torkelson's Research](https://dinodiver.github.io/mitchtorkelson/)
 
 ## Acknowledgements
 We thank the Gordan and Betty Moore Foundation for funding this project. We thank UNCW’s Center for Marine Science, particularly Dave Wells for dock maintenance and data collection support. Thanks to the advisory committee and all who have supported this research. Thanks to the SeaHawk-HawkEye development and characterization team, including John Morrison, Gene Feldman, Alan Holmes, Sean Bailey, Alicia Scott, and Liang Hong.
