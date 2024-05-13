@@ -26,7 +26,8 @@ The project will continue with the analysis of collected data, matchup analysis,
 
 ## Contact
 Mitchell D. Torkelson  
-University of North Carolina Wilmington  
+University of North Carolina Wilmington
+[COAST Lab Graduate Researcher](https://coast-lab.org/MitchTorkelson/)  
 Center for Marine Science  
 **Email:** [mdt3971@uncw.edu](mailto:mdt3971@uncw.edu)  
 **Portfolio:** [Mitch Torkelson's Research](https://dinodiver.github.io/mitchtorkelson/)
