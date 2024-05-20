@@ -4,16 +4,13 @@ import matplotlib.pyplot as plt
 import warnings
 import os
 
-# Set font sizes
-title_font_size = 18
+title_font_size = 24
 axis_label_font_size = 16
-tick_label_font_size = 14
-legend_font_size = 14
-legend_title_font_size = 14
+tick_label_font_size = 22
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu', 'statistics', 'comprehensive_stats.csv')
-OUTPUT_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu', 'statistics', 'visual_analysis')
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu', 'statistics', 'bar-plots')
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
@@ -41,16 +38,16 @@ for metric in metrics:
     print(f"Generating plot for {metric}...")
     plt.figure(figsize=(12, 8))
     plot = sns.barplot(x='Sensor_Name', y=metric, hue='Depth_Range', data=data)
-    plot.set_title(f'{metric} for Satellite Sensor by Depth Range, {pixel_window_size} Pixel Window Size', fontsize=title_font_size)
-    plot.set_xticklabels(data['Sensor_Name'].unique(), rotation=0, ha='right', fontsize=tick_label_font_size)
-    plot.set_yticklabels(plot.get_yticks(), fontsize=tick_label_font_size)
+    plot.set_title(f'{metric}', fontsize=title_font_size)
+    #plot.set_title(f'{metric} for Satellite Sensor by Depth Range, {pixel_window_size} Pixel Window Size', fontsize=title_font_size)
+    plot.set_xticklabels(data['Sensor_Name'].unique(), rotation=0, ha='center', fontsize=tick_label_font_size)
+    plt.yticks(fontsize=tick_label_font_size)
     plt.xlabel('Sensor', fontsize=axis_label_font_size)
     plt.ylabel(metric, fontsize=axis_label_font_size)
     plt.axhline(0, color='gray', linestyle='solid')
-    handles, labels = plot.get_legend_handles_labels()
-    if labels:
-        plt.legend(handles, labels, title='Depth Range of In-Situ Data', title_fontsize=legend_title_font_size, fontsize=legend_font_size)
+    plt.legend(title='Depth Range of In-Situ Data')
     output_filename = f'{metric.lower()}_comparison_{pixel_window_size}.png'
     output_path = os.path.join(OUTPUT_DIR, output_filename)
     plt.savefig(output_path, dpi=500, bbox_inches='tight')
     plt.close()
+
