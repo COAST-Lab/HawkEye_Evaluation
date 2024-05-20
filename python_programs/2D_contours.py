@@ -39,7 +39,6 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data')
 ACROBAT_DIR = os.path.join(DATA_DIR, 'acrobat', 'transects', 'processed')
 
-# Dynamically set the SAVE_DIR based on the DATA_TYPE and INTERPOLATION_METHOD
 SAVE_DIR = os.path.join(SCRIPT_DIR, '..', f'visualization', 'contour_plots', 'wb', DATA_TYPE, '2D_plots', 'contour_interp', INTERPOLATION_METHOD)
 if not ENABLE_INTERPOLATION:
     SAVE_DIR = os.path.join(SCRIPT_DIR, '..', f'visualization', 'contour_plots', 'wb', DATA_TYPE, '2D_plots', 'contours')

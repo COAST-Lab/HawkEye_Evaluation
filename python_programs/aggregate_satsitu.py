@@ -18,7 +18,7 @@ df = pd.read_csv(DATA_DIR)
 sensor_identifiers = set(col.rsplit('_', 1)[0] for col in df.columns if 'irow' in col)
 
 # Specify the depth ranges
-depth_ranges = [(0, 2), (2, 4), (4, 6), (6, 8), (8, 10), (0, 10), (0, 5), (5, 10), (0, 4), (4, 7), (7, 10)]
+depth_ranges = [(0, 4), (4, 7), (7, 10), (0, 10)]
 
 # Suppress warnings related to mean of empty slices and DataFrame fragmentation
 warnings.filterwarnings('ignore', category=RuntimeWarning)

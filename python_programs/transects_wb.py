@@ -50,7 +50,7 @@ gl.ylabel_style = {'size': 16}  # Customize font size for y labels
 #plt.text(0.5, -0.07, 'Longitude', va='bottom', ha='center', rotation='horizontal', rotation_mode='anchor', transform=ax.transAxes, fontsize=16)
 #plt.text(-0.07, 0.5, 'Latitude', va='bottom', ha='center', rotation='vertical', rotation_mode='anchor', transform=ax.transAxes, fontsize=16)
 
-plt.title("R/V Cape Fear, May 05 2023, Wilmington, NC", fontsize=20)
+plt.title("R/V Cape Fear, May 05 2023, Masonboro Inlet", fontsize=20)
 
 # Add Compass Rose
 new_ax = fig.add_axes([0.65, 0.75, 0.2, 0.1], anchor='NE', zorder=1)

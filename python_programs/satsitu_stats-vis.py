@@ -19,6 +19,11 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 df = pd.read_csv(DATA_DIR)
 print("Data loaded successfully.")
 
+title_font_size = 18
+axis_label_font_size = 16
+tick_label_font_size = 26
+legend_font_size = 14
+
 # Dictionary mapping sensor names to identifiers
 sensor_datetime_dict = {
     'Hawkeye': ('SEAHAWK1_HAWKEYE', '20230507T150955'),
@@ -27,7 +32,7 @@ sensor_datetime_dict = {
     'S3A': ('S3A_OLCI_EFRNT', '20230507T153421')
 }
 
-pixel_window_sizes = ['1x1', '2x2', '3x3']
+pixel_window_sizes = ['1x1'] # '2x2', '3x3'
 
 depth_ranges = [(0, 4), (4, 7), (7, 10), (0, 10)]
 
@@ -84,26 +89,17 @@ for sensor_name, (sensor_identifier, date) in sensor_datetime_dict.items():
             })
             comprehensive_stats_df = pd.concat([comprehensive_stats_df, new_row], ignore_index=True)
 
-        # Define custom labels based on user-defined inputs and calculated metrics
-            #x_label = 'In Situ Chlorophyll (µg/L)'
-            #y_label = f'{sensor_name.title()} Chlorophyll (µg/L)'
-            #plot_title = f'{sensor_name.title()}, {date}, {pixel_size}, {depth_range_str}m' 
-
             f, ax = plt.subplots(figsize=(10, 6))
             f.set_facecolor('#FFFFFF')  # Set the background color of the figure
             ax.set_facecolor('#EAEAF2')  # Set the background color of the axes
 
             sns.scatterplot(x=true_values, y=predicted_values, alpha=0.7, s=50, color=".15", ax=ax)
-
-            # Draw histogram with density contours on the same axes
-            sns.histplot(x=true_values, y=predicted_values, bins=50, pthresh=.1, cmap="mako", ax=ax)
+            hist = sns.histplot(x=true_values, y=predicted_values, bins=50, pthresh=.1, cmap="mako", ax=ax, cbar=True)
             sns.kdeplot(x=true_values, y=predicted_values, levels=5, color="w", linewidths=1, ax=ax)
 
-            # Generate a line for the polynomial regression model
+            # Regression model
             sorted_zip = sorted(zip(true_values, predicted_chl_poly), key=lambda x: x[0])
             true_values_sorted, predicted_chl_poly_sorted = zip(*sorted_zip)
-
-            # Plot the regression line on the same axes
             sns.lineplot(x=true_values_sorted, y=predicted_chl_poly_sorted, color='#F76B34', linewidth=2, ax=ax)
 
             # Adding annotations for the metrics
@@ -112,18 +108,13 @@ for sensor_name, (sensor_identifier, date) in sensor_datetime_dict.items():
                         horizontalalignment='right', verticalalignment='top',
                         bbox=dict(boxstyle='round,pad=0.5', fc='#FFFFFF', alpha=0.5))
 
-
-
-            # Setting the x-axis and y-axis labels
-            #ax.set_xlabel(x_label)
-            #ax.set_ylabel(y_label)
+            #ax.set_xlabel('In Situ Chlorophyll (µg/L)', fontsize=axis_label_font_size)
+            #ax.set_ylabel(f'{sensor_name.title()} Chlorophyll (µg/L)', fontsize=axis_label_font_size)
+            #ax.set_title(f'{sensor_name.title()}, {date}, {pixel_size}, {depth_range_str}m', fontsize=title_font_size)
             ax.set_xlabel('')
             ax.set_ylabel('')
+            ax.tick_params(axis='both', which='major', labelsize=tick_label_font_size)
 
-            # Setting the plot title
-            #ax.set_title(plot_title)
-
-            # Saving the plot with a filename that reflects the sensor name, satellite capture date, depth range, and pixel window size
             plot_filename = os.path.join(OUTPUT_DIR, 'scatter_plots', f"{sensor_name}_{date}_{depth_range_str}_{pixel_size}.png")
             plt.savefig(plot_filename, dpi=500, bbox_inches='tight')
             plt.close(f)

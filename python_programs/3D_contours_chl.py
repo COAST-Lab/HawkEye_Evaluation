@@ -11,7 +11,6 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from tqdm import tqdm
 from PIL import Image
 
-
 INTERPOLATION_METHOD = 'linear' # linear, cubic, nearest
 DATA_TYPE = 'chlor_a'  # options are 'temp', 'salinity', 'density', 'turbidity', 'cdom', 'chlor_a', 'ox_sat'
 EARTH_RADIUS = 6371  # in kilometers

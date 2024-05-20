@@ -54,8 +54,8 @@ variable_properties = {
     },
     'chlor_a': {
         'cmap': cmocean.cm.algae,
-        'norm': LogNorm(vmin=0.1, vmax=5.5),
-        'tick_values': np.logspace(np.log10(0.1), np.log10(5.5), num=7),
+        'norm': LogNorm(vmin=0.1, vmax=10),
+        'tick_values': np.logspace(np.log10(0.1), np.log10(10), num=7),
         'label_text': 'Chlorophyll a (µg/L)'
     }
 }

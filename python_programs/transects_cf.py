@@ -38,7 +38,7 @@ gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1, color='
 gl.top_labels = False
 gl.right_labels = False
 
-plt.title("R/V Cape Fear, May 03 2023, Wilmington, NC")
+plt.title("R/V Cape Fear, May 03 2023, Cape Fear River")
 
 new_ax = fig.add_axes([0.675, 0.75, 0.1, 0.1])
 compass_rose = mpimg.imread(COMPASS_ROSE_PATH)
