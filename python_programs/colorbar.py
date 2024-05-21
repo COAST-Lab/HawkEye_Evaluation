@@ -10,11 +10,11 @@ if not os.path.exists(SAVE_DIR):
     os.makedirs(SAVE_DIR)
 
 variable_properties = {
-    'ox_sat': {
+    'do': {
         'cmap': cmocean.cm.deep,  # Colormap for oxygen saturation
         'norm': Normalize(vmin=7.36524, vmax=7.45626),  # Normalization range for oxygen saturation
         'tick_values': np.linspace(7.36524, 7.45626, 7),  # Tick values for the colorbar
-        'label_text': 'Oxygen Saturation (%)'  # Label for the colorbar
+        'label_text': 'Dissolved Oxygen (mg/L)'  # Label for the colorbar
     },
     'turbidity': {
         'cmap': cmocean.cm.turbid,  # Colormap for turbidity
@@ -91,5 +91,5 @@ def create_colorbar(variable, orientation='horizontal', title_size=12, use_log_s
     return colorbar_path
 
 # Example Usage
-horizontal_colorbar_path_log = create_colorbar('chlor_a', 'horizontal', title_size=16, use_log_scale=True)
-vertical_colorbar_path_normal = create_colorbar('chlor_a', 'vertical', title_size=16, use_log_scale=True)
+horizontal_colorbar_path_log = create_colorbar('do', 'horizontal', title_size=16, use_log_scale=True)
+vertical_colorbar_path_normal = create_colorbar('do', 'vertical', title_size=16, use_log_scale=True)

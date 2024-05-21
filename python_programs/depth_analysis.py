@@ -37,7 +37,7 @@ variables_to_plot = {
     'salinity': 'Salinity (psu)',
     'turbidity': 'Turbidity (NTU)',
     'chlor_a': 'Chlorophyll-a (µg/L)',
-    'ox_sat': 'Oxygen Saturation (%)',
+    'do': 'Dissolved Oxygen (mg/L)',
     'density': 'Density (kg/m³)'
 }
 

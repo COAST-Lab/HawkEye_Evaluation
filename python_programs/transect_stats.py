@@ -19,7 +19,7 @@ depth_labels = ['0-2', '2-4', '4-6', '6-8', '8-10']
 data['depth_range'] = pd.cut(data['depth'], bins=depth_bins, labels=depth_labels, right=False, include_lowest=True)
 data['overall_range'] = '0-10'
 
-parameters = ['temp', 'density', 'salinity', 'turbidity', 'ox_sat', 'chlor_a']
+parameters = ['temp', 'density', 'salinity', 'turbidity', 'do', 'chlor_a']
 rows_list = []
 
 # Loop through each parameter to calculate stats

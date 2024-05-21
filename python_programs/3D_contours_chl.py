@@ -23,6 +23,11 @@ SAVE_DIR = os.path.join(SCRIPT_DIR, '..', f'visualization', 'contour_plots', 'wb
 INSET_MAP = os.path.join(SCRIPT_DIR, '..', f'visualization', 'maps', 'transects_wb.png')
 SHORE_POINT = (-77.802938, 34.195220)
 
+LABEL_FONT_SIZE = 14
+TICK_FONT_SIZE = 12
+TITLE_FONT_SIZE = 18
+COLORBAR_FONT_SIZE = 14
+
 colormap_and_label = {
     'temp': (cmocean.cm.thermal, 'Temperature (°C)'),
     'salinity': (cmocean.cm.haline, 'Salinity (PSU)'),
@@ -50,7 +55,6 @@ def get_global_min_max(file_names):
     global_min_depth = []
     global_max_depth = []
 
-    
     print(f"Processing global min/max {DATA_TYPE} values and depth...")
     for fname in tqdm(file_names):
         try:
@@ -120,16 +124,21 @@ def plot_3D_transects(file_names, global_min, global_max, global_min_depth, glob
         # Plotting
         ax.scatter(xi, yi, zi, c=colors.flatten(), cmap=colormap, marker='o', alpha=0.6, vmin=global_min, vmax=global_max)
         
-    ax.set_xlabel('Distance from Shore (km)')
-    ax.set_ylabel('Distance along transect (km)')
-    ax.set_zlabel('Depth (m)')
+    ax.set_xlabel('Distance from Shore (km)', fontsize=LABEL_FONT_SIZE)
+    ax.set_ylabel('Distance along transect (km)', fontsize=LABEL_FONT_SIZE)
+    ax.set_zlabel('Depth (m)', fontsize=LABEL_FONT_SIZE)
     ax.set_xlim(2.5, 4.5)
     ax.set_ylim(ax.get_ylim())
     ax.set_zlim(global_max_depth, 0)
+
     sm = plt.cm.ScalarMappable(cmap=colormap, norm=LogNorm(vmin=0.1, vmax=5.5))
     sm.set_array([])
-    cbar = plt.colorbar(sm, ax=ax, ticks=np.linspace(0, 5.5, 12)) 
-    cbar.set_label('Log10 of Chlorophyll a (µg/L)')
+    cbar = plt.colorbar(sm, ax=ax, ticks=np.linspace(0, 5.5, 12))
+    cbar.set_label('Log10 of Chlorophyll a (µg/L)', fontsize=COLORBAR_FONT_SIZE)
+
+    for label in (ax.get_xticklabels() + ax.get_yticklabels() + ax.get_zticklabels()):
+        label.set_fontsize(TICK_FONT_SIZE)
+    cbar.ax.tick_params(labelsize=TICK_FONT_SIZE)
 
     axins = inset_axes(ax, width="30%", height="30%", loc='upper left')
     img = plt.imread(INSET_MAP)

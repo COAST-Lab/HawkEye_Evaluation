@@ -11,7 +11,7 @@ from matplotlib.ticker import FormatStrFormatter
 from matplotlib.colors import LogNorm
 
 INTERPOLATION_METHOD = 'linear'     # options are linear, cubic, or nearest.
-DATA_TYPE = 'ox_sat'               # options are temp, salinity, density, turbidity, cdom, chlor_a, ox_sat.
+DATA_TYPE = 'turbidity'               # options are temp, salinity, density, turbidity, cdom, chlor_a, do.
 
 SHOW_TRANSECT_TITLE = True          # Set to False to hide transect titles.
 SHOW_AXES_TITLES = True             # Set to False to hide axes titles.
@@ -28,11 +28,11 @@ ENABLE_INTERPOLATION = True         # Set to False to disable data interpolation
 ENABLE_BATHYMETRY = True            # Set to Flase to disable bathymetry data.
 
 # Set default font sizes for all plots
-plt.rcParams['font.size'] = 12  # Main font size
-plt.rcParams['axes.labelsize'] = 18  # Axes label size
-plt.rcParams['axes.titlesize'] = 20  # Figure title size
-plt.rcParams['xtick.labelsize'] = 16  # X-tick label size
-plt.rcParams['ytick.labelsize'] = 16  # Y-tick label size
+plt.rcParams['font.size'] = 28  # Main font size
+plt.rcParams['axes.labelsize'] = 28  # Axes label size
+plt.rcParams['axes.titlesize'] = 32  # Figure title size
+plt.rcParams['xtick.labelsize'] = 28  # X-tick label size
+plt.rcParams['ytick.labelsize'] = 28  # Y-tick label size
 plt.rcParams['figure.dpi'] = 500  # Figure resolution
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -153,9 +153,9 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
             fixed_min = 0.1  # Minimum value for the color scale
             fixed_max = 5.5  # Maximum value for the color scale
             norm = LogNorm(vmin=fixed_min, vmax=fixed_max)  # Using LogNorm for chlor_a
-        elif DATA_TYPE == 'ox_sat':
+        elif DATA_TYPE == 'do':
             colormap = cmocean.cm.deep
-            data_label = 'Oxygen Saturation (%)'
+            data_label = 'Dissolved Oxygen (mg/L)'
         else:
             colormap = cmocean.cm.haline  # Default colormap
             data_label = f'{DATA_TYPE.capitalize()} value'
@@ -252,11 +252,11 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
         ax.invert_yaxis()
 
         if SHOW_AXES_TITLES:
-            ax.set_xlabel('Distance along transect (km)')
+            ax.set_xlabel('Distance (km)')
             ax.set_ylabel('Depth (m)')
 
         if SHOW_TRANSECT_TITLE:
-            ax.set_title(f'{DATA_TYPE.capitalize()} gradient of transect {idx + 1}')
+            ax.set_title(f'Transect {idx + 1}')
 
         # Saving the figure with the specified DPI
         plt.savefig(f"{SAVE_DIR}/transect_{idx + 1}.png", dpi=plt.rcParams['figure.dpi'], bbox_inches='tight')

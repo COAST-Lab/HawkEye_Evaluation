@@ -5,6 +5,8 @@ import cartopy.feature as cfeature
 import pandas as pd
 import numpy as np
 import os
+import matplotlib.ticker as mticker
+
 
 # Set up directories
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -19,7 +21,7 @@ def add_scale_bar(ax, length, location=(0.940, 0.075), linewidth=3):
     x = x0 + (x1 - x0) * location[0]
     y = y0 + (y1 - y0) * location[1]
     ax.plot([x, x - scale_length], [y, y], transform=ccrs.Geodetic(), color='black', linewidth=linewidth)
-    ax.text(x - scale_length / 2, y - 0.001, f'{length} km', verticalalignment='top', horizontalalignment='center',  fontsize=16, transform=ccrs.Geodetic(), color='black')
+    ax.text(x - scale_length / 2, y - 0.001, f'{length} km', verticalalignment='top', horizontalalignment='center', fontsize=28, transform=ccrs.Geodetic(), color='black')
 
 data = pd.read_csv(ACROBAT_DIR)
 
@@ -38,19 +40,19 @@ for i, transect_id in enumerate(sorted(data['transect_id'].unique())):
     ax.plot(transect_data['lon'], transect_data['lat'], color=transect_colors[i], label=f'Transect {transect_id}', transform=ccrs.Geodetic())
 
 # Add legend for transects with larger font
-ax.legend(loc='upper left', fontsize=20)
+ax.legend(loc='upper left', fontsize=28)
 
 # Set up grid lines and tick marks with larger font size
 gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1, color='gray', alpha=0.5, linestyle='--')
 gl.top_labels = False
 gl.right_labels = False
-gl.xlabel_style = {'size': 16}  # Customize font size for x labels
-gl.ylabel_style = {'size': 16}  # Customize font size for y labels
+gl.xlocator = mticker.FixedLocator(np.arange(extent[0], extent[1]+0.01, 0.05))
+gl.ylocator = mticker.FixedLocator(np.arange(extent[2], extent[3]+0.01, 0.05))
+gl.xlabel_style = {'size': 32}
+gl.ylabel_style = {'size': 32}
 
-#plt.text(0.5, -0.07, 'Longitude', va='bottom', ha='center', rotation='horizontal', rotation_mode='anchor', transform=ax.transAxes, fontsize=16)
-#plt.text(-0.07, 0.5, 'Latitude', va='bottom', ha='center', rotation='vertical', rotation_mode='anchor', transform=ax.transAxes, fontsize=16)
 
-plt.title("R/V Cape Fear, May 05 2023, Masonboro Inlet", fontsize=20)
+plt.title("Masonboro Inlet", fontsize=36)
 
 # Add Compass Rose
 new_ax = fig.add_axes([0.65, 0.75, 0.2, 0.1], anchor='NE', zorder=1)

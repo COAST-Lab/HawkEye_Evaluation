@@ -12,7 +12,7 @@ from tqdm import tqdm
 from PIL import Image
 
 INTERPOLATION_METHOD = 'linear' # linear, cubic, nearest
-DATA_TYPE = 'ox_sat'  # options are 'temp', 'salinity', 'density', 'turbidity', 'cdom', 'chlor_a', 'ox_sat'
+DATA_TYPE = 'do'  # options are 'temp', 'salinity', 'density', 'turbidity', 'cdom', 'chlor_a', 'do'
 EARTH_RADIUS = 6371  # in kilometers
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -30,7 +30,7 @@ colormap_and_label = {
     'turbidity': (cmocean.cm.turbid, 'Turbidity (NTU)'),
     'cdom': (cmocean.cm.matter, 'CDOM'),
     'chlor_a': (cmocean.cm.algae, 'Chlorophyll a (µg/L)'),
-    'ox_sat': (cmocean.cm.deep, 'Oxygen Saturation (%)')
+    'do': (cmocean.cm.deep, 'Dissolved Oxygen (mg/L)')
 }
 
 def haversine(lon1, lat1, lon2, lat2):

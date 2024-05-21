@@ -21,11 +21,16 @@ os.makedirs(SAVE_DIR, exist_ok=True)
 TRANSECTS = [os.path.join(ACROBAT_DIR, file) for file in os.listdir(ACROBAT_DIR) if file.startswith('transect_') and file.endswith('.csv')]
 SATELLITE_IMGS = [file for file in os.listdir(SATELLITE_IMAGES_DIR) if file.endswith('.png')]
 
+TITLE_FONT_SIZE = 32
+LABEL_FONT_SIZE = 28
+TICK_FONT_SIZE = 28
+SCALE_BAR_FONT_SIZE = 20
+
 SUBPLOT_TITLES = [
-    "Chl - MODIS (1000m) from May 07, 2023",
-    "Chl - SeaHawk-HawkEye (120m) from May 07, 2023",
-    "Chl - S3A-OLCI (300m) from May 07, 2023",
-    "Chl - S3B-OLCI (300m) from May 07, 2023"
+    "Chl - MODIS (1000m)",
+    "Chl - HawkEye (120m)",
+    "Chl - S3A-OLCI (300m)",
+    "Chl - S3B-OLCI (300m)"
 ]
 
 SAT_IMG_BOUNDS = [34.10, 34.25, -77.85, -77.70]  # [min_lat, max_lat, min_lon, max_lon]
@@ -64,7 +69,7 @@ def main():
     if not os.path.exists(SAVE_DIR):
         os.makedirs(SAVE_DIR)
 
-    may_7_images = [img for img, title in zip(SATELLITE_IMGS, SUBPLOT_TITLES) if "May 07, 2023" in title]
+    may_7_images = [img for img in SATELLITE_IMGS]
 
     fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(20, 20), subplot_kw={'projection': ccrs.PlateCarree()})
     fig.patch.set_facecolor('#FFFFFF')
@@ -91,7 +96,7 @@ def main():
             continue
 
         plot_transects(ax, dfs, 'red')
-        ax.set_title(SUBPLOT_TITLES[i])
+        ax.set_title(SUBPLOT_TITLES[i], fontsize=TITLE_FONT_SIZE)
 
         compass_rose_image = mpimg.imread(COMPASS_ROSE_PATH)
         compass_size = 0.02  # Define the size of the compass rose
@@ -100,21 +105,22 @@ def main():
         compass_x = x1 - (x1 - x0) * 0.207
         compass_y = y0 + (y1 - y0) * 0.07
         ax.imshow(compass_rose_image, extent=[compass_x, compass_x + compass_size, compass_y, compass_y + compass_size], transform=ccrs.PlateCarree(), origin='upper')
-        add_scale_bar(ax, length_km=2, location=(0.8, 0.05), linewidth=2, color='black', fontsize=12)
+        add_scale_bar(ax, length_km=2, location=(0.8, 0.05), linewidth=2, color='black', fontsize=SCALE_BAR_FONT_SIZE)
 
         # Set latitude and longitude tick marks
-        ax.set_xticks(np.linspace(min_lon, max_lon, num=5), crs=ccrs.PlateCarree())
-        ax.set_yticks(np.linspace(min_lat, max_lat, num=5), crs=ccrs.PlateCarree())
-        lon_formatter = cticker.LongitudeFormatter()
-        lat_formatter = cticker.LatitudeFormatter()
-        ax.xaxis.set_major_formatter(lon_formatter)
-        ax.yaxis.set_major_formatter(lat_formatter)
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1, color='gray', alpha=0.5, linestyle='--')
+        gl.top_labels = False
+        gl.right_labels = False
+        gl.xlocator = mticker.FixedLocator(np.arange(SAT_IMG_BOUNDS[2], SAT_IMG_BOUNDS[3]+0.01, 0.05))
+        gl.ylocator = mticker.FixedLocator(np.arange(SAT_IMG_BOUNDS[0], SAT_IMG_BOUNDS[1]+0.01, 0.05))
+        gl.xlabel_style = {'size': LABEL_FONT_SIZE}
+        gl.ylabel_style = {'size': LABEL_FONT_SIZE}
 
     # Hide unused subplots if there are any
     for j in range(i + 1, len(axes)):
         axes[j].axis('off')
 
-    plt.subplots_adjust(wspace=0.15, hspace=0.15)
+    plt.subplots_adjust(wspace=0.25, hspace=0.15)
     plt.savefig(os.path.join(SAVE_DIR, "mosaic_masonboro_chl.png"), dpi=500, bbox_inches='tight')  # Adjusted dpi
     plt.close(fig)
 

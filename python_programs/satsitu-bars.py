@@ -4,10 +4,6 @@ import matplotlib.pyplot as plt
 import warnings
 import os
 
-title_font_size = 24
-axis_label_font_size = 16
-tick_label_font_size = 22
-
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu', 'statistics', 'comprehensive_stats.csv')
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu', 'statistics', 'bar-plots')
@@ -21,6 +17,10 @@ pixel_window_size = '1x1'  # Can be changed to '2x2' or '3x3'
 print("Loading data...")
 data = pd.read_csv(DATA_DIR)
 print("Data loaded successfully.")
+
+title_font_size = 24
+axis_label_font_size = 16
+tick_label_font_size = 22
 
 # Filter data based on pixel window size
 data = data[data['Pixel_Window_Size'] == pixel_window_size]
