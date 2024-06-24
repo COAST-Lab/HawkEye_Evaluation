@@ -11,7 +11,7 @@ from matplotlib.ticker import FormatStrFormatter
 from matplotlib.colors import LogNorm
 
 INTERPOLATION_METHOD = 'linear'     # options are linear, cubic, or nearest.
-DATA_TYPE = 'turbidity'               # options are temp, salinity, density, turbidity, cdom, chlor_a, do.
+DATA_TYPE = 'chlor_a'               # options are temp, salinity, density, turbidity, cdom, chlor_a, do.
 
 SHOW_TRANSECT_TITLE = True          # Set to False to hide transect titles.
 SHOW_AXES_TITLES = True             # Set to False to hide axes titles.
@@ -150,8 +150,8 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
             colormap = cmocean.cm.algae
             data_label = 'Chlorophyll a (µg/L)'
             # Define fixed_min and fixed_max for chlorophyll a visualization
-            fixed_min = 0.1  # Minimum value for the color scale
-            fixed_max = 5.5  # Maximum value for the color scale
+            fixed_min = 0.001  # Minimum value for the color scale
+            fixed_max = 2.02  # Maximum value for the color scale
             norm = LogNorm(vmin=fixed_min, vmax=fixed_max)  # Using LogNorm for chlor_a
         elif DATA_TYPE == 'do':
             colormap = cmocean.cm.deep
@@ -184,7 +184,7 @@ def plot_transect_gradients(file_names, bathymetry_data, transform, global_min, 
             # Interpolation of the data
             zi = griddata((df['normalized_distance'], df['depth']), df[DATA_TYPE], (xi, yi), method=INTERPOLATION_METHOD)
             zi = np.ma.masked_invalid(zi)
-            contour = ax.contourf(xi, yi, zi, NUM_CONTOUR_LEVELS, cmap=colormap, vmin=global_min, vmax=global_max)
+            contour = ax.contourf(xi, yi, zi, NUM_CONTOUR_LEVELS, cmap=colormap, vmin=fixed_min, vmax=fixed_max)
 
             if SHOW_COLORBAR:
                 cbar = plt.colorbar(contour, ticks=colorbar_ticks)

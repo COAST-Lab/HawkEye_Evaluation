@@ -7,8 +7,6 @@ import numpy as np
 import os
 import matplotlib.ticker as mticker
 
-
-# Set up directories
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data')
 ACROBAT_DIR = os.path.join(DATA_DIR, 'acrobat', 'transects', 'processed', 'processed_dataset.csv')
@@ -41,18 +39,16 @@ for i, transect_id in enumerate(sorted(data['transect_id'].unique())):
 
 # Add legend for transects with larger font
 ax.legend(loc='upper left', fontsize=28)
-
-# Set up grid lines and tick marks with larger font size
 gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1, color='gray', alpha=0.5, linestyle='--')
 gl.top_labels = False
 gl.right_labels = False
-gl.xlocator = mticker.FixedLocator(np.arange(extent[0], extent[1]+0.01, 0.05))
-gl.ylocator = mticker.FixedLocator(np.arange(extent[2], extent[3]+0.01, 0.05))
+gl.xlocator = mticker.FixedLocator(np.arange(extent[0], extent[1]+0.00, 0.03))
+gl.ylocator = mticker.FixedLocator(np.arange(extent[2], extent[3]+0.00, 0.03))
 gl.xlabel_style = {'size': 32}
 gl.ylabel_style = {'size': 32}
 
 
-plt.title("Masonboro Inlet", fontsize=36)
+plt.title("R/V Cape Fear, May 5 2023, Masonboro Inlet", fontsize=40)
 
 # Add Compass Rose
 new_ax = fig.add_axes([0.65, 0.75, 0.2, 0.1], anchor='NE', zorder=1)

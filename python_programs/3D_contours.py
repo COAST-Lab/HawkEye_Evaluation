@@ -1,4 +1,3 @@
-
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
@@ -12,7 +11,7 @@ from tqdm import tqdm
 from PIL import Image
 
 INTERPOLATION_METHOD = 'linear' # linear, cubic, nearest
-DATA_TYPE = 'do'  # options are 'temp', 'salinity', 'density', 'turbidity', 'cdom', 'chlor_a', 'do'
+DATA_TYPE = 'chlor_a'  # options are 'temp', 'salinity', 'density', 'turbidity', 'cdom', 'chlor_a', 'do'
 EARTH_RADIUS = 6371  # in kilometers
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -71,8 +70,8 @@ def plot_3D_transects(file_names, global_min, global_max, global_min_depth, glob
     global_min = global_min_values[DATA_TYPE]
     global_max = global_max_values[DATA_TYPE]
 
-    fig = plt.figure(figsize=(18, 18))
-    ax = fig.add_subplot(111, projection='3d')
+    fig = plt.figure(figsize=(18, 18), facecolor='#FFFFFF')  # Set figure background color
+    ax = fig.add_subplot(111, projection='3d', facecolor='#FFFFFF')  # Set axes background color
     
     distances_from_shore = []
     
@@ -156,7 +155,7 @@ def plot_3D_transects(file_names, global_min, global_max, global_min_depth, glob
         os.makedirs(SAVE_DIR)
     combined_save_path = f"{SAVE_DIR}/upto_transect_{upto_idx + 1}.png"
     plt.tight_layout()
-    plt.savefig(combined_save_path, dpi=300)
+    plt.savefig(combined_save_path, dpi=500, facecolor='#FFFFFF', bbox_inches='tight')  # Save with white background
     plt.close()
 
 def create_gif(image_folder, gif_path, duration=1000):
@@ -164,10 +163,16 @@ def create_gif(image_folder, gif_path, duration=1000):
     for file_name in sorted(os.listdir(image_folder)):
         if file_name.endswith('.png'):
             file_path = os.path.join(image_folder, file_name)
-            images.append(Image.open(file_path))
+            img = Image.open(file_path).convert('RGBA')  # Convert image to RGBA to handle transparency
+            # Create a white background image
+            background = Image.new('RGBA', img.size, (255, 255, 255, 255))
+            # Composite the image on top of the white background
+            combined = Image.alpha_composite(background, img)
+            images.append(combined)
 
     images[0].save(gif_path, save_all=True, append_images=images[1:], optimize=False, duration=duration, loop=0)
     print(f"GIF saved at {gif_path}")
+
 
 def main():
     if not os.path.exists(SAVE_DIR):

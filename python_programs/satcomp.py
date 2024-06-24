@@ -4,12 +4,19 @@ from netCDF4 import Dataset
 import cmocean
 import cartopy.crs as ccrs
 import cartopy.feature as cfeat
-from matplotlib.ticker import FuncFormatter
+import matplotlib.ticker as mticker
 import os
+
+# Define font size variables
+title_fontsize = 24
+label_fontsize = 20
+tick_label_fontsize = 18
+colorbar_label_fontsize = 18
+colorbar_tick_fontsize = 18
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data')
-OUTPUT_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'maps', 'masonboro')
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'maps')
 OUTPUT_FILE = 'sat_chlor_comparison.png'
 OUTPUT_PATH = os.path.join(OUTPUT_DIR, OUTPUT_FILE)
 
@@ -39,21 +46,9 @@ def check_compatibility(data1, data2):
     # Check if the two datasets have the same shape and are thus compatible.
     if data1.shape != data2.shape:
         raise ValueError("Datasets are not compatible: shapes do not match.")
-    
-def longitude_formatter(lon):
-    # Format longitude labels
-    if lon < 0:
-        return f"{abs(lon)}°W"
-    else:
-        return f"{lon}°E"
 
-def latitude_formatter(lat):
-    # Format latitude labels
-    if lat < 0:
-        return f"{abs(lat)}°S"
-    else:
-        return f"{lat}°N"
-
+def round_ticks(value, pos):
+    return f"{value:.2f}"
 
 def main():
     if not os.path.exists(OUTPUT_DIR):
@@ -61,7 +56,7 @@ def main():
     
     # Define geographical bounds
     lon_west, lon_east, lat_south, lat_north = -77.85, -77.70, 34.10, 34.25
-
+    extent = [lon_west, lon_east, lat_south, lat_north]
 
     # Load the chlorophyll-a data
     s3a_chlor_a = load_chlor_a_data(S3A_FILE_PATH)
@@ -74,7 +69,7 @@ def main():
         print(e)
         return
     
-     # Calculate the difference between the two satellite datasets
+    # Calculate the difference between the two satellite datasets
     difference = calculate_difference(s3a_chlor_a, s3b_chlor_a)
     
     extreme_swing = np.nanmax(np.abs(difference))
@@ -86,7 +81,7 @@ def main():
 
     # Plotting
     fig, ax = plt.subplots(figsize=(10, 8), subplot_kw={'projection': ccrs.PlateCarree()})
-    ax.set_extent([lon_west, lon_east, lat_south, lat_north], crs=ccrs.PlateCarree())
+    ax.set_extent(extent, crs=ccrs.PlateCarree())
 
     # Set the figure and axes background color
     fig.patch.set_facecolor('#FFFFFF')
@@ -98,23 +93,29 @@ def main():
 
     # Ensure NaN values or masked areas in 'difference' are handled to match the background
     img = ax.imshow(difference, cmap=cmocean.cm.balance_r, vmin=-np.nanmax(np.abs(difference)), vmax=np.nanmax(np.abs(difference)),
-                extent=[lon_west, lon_east, lat_south, lat_north], transform=ccrs.PlateCarree(), origin='upper')
+                    extent=extent, transform=ccrs.PlateCarree(), origin='upper')
 
     # Adding colorbar with label
-    cbar = plt.colorbar(img, ax=ax, shrink=0.7)
-    cbar.set_label('Chlorophyll-a Diff (µg/L)', fontsize=12)
-    
+    cbar = plt.colorbar(img, ax=ax)
+    cbar.set_label('Δ[Chl a] (µg/L)', fontsize=colorbar_label_fontsize)
+    cbar.ax.tick_params(labelsize=colorbar_tick_fontsize)
+
     # Setting x and y labels
-    ax.set_xlabel('Longitude', fontsize=12)
-    ax.set_ylabel('Latitude', fontsize=12)
+    ax.set_xlabel('Longitude', fontsize=label_fontsize)
+    ax.set_ylabel('Latitude', fontsize=label_fontsize)
     
     # Formatting and setting the axis labels and ticks
-    ax.set_xticks(np.linspace(lon_west, lon_east, 4), crs=ccrs.PlateCarree())
-    ax.set_yticks(np.linspace(lat_south, lat_north, 4), crs=ccrs.PlateCarree())
-    ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: longitude_formatter(x)))
-    ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: latitude_formatter(y)))
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1, color='gray', alpha=0.5, linestyle='--')
+    gl.top_labels = False
+    gl.right_labels = False
+    gl.xlocator = mticker.FixedLocator(np.round(np.arange(lon_west, lon_east, 0.03), 2))
+    gl.ylocator = mticker.FixedLocator(np.round(np.arange(lat_south, lat_north, 0.03), 2))
+    gl.xlabel_style = {'size': tick_label_fontsize}
+    gl.ylabel_style = {'size': tick_label_fontsize}
+    gl.xformatter = mticker.FuncFormatter(round_ticks)
+    gl.yformatter = mticker.FuncFormatter(round_ticks)
     
-    plt.title('24-Hour Chlorophyll-a Change (May 6 - May 7)', fontsize=14)
+    plt.title('24-Hour Δ[Chl a] (µg/L)', fontsize=title_fontsize)
     plt.savefig(OUTPUT_PATH, dpi=500, bbox_inches='tight')
 
 if __name__ == "__main__":

@@ -16,8 +16,8 @@ NATURAL_EARTH_DIR = os.path.join(SCRIPT_DIR, 'local_processing_resources', 'natu
 # Set Cartopy to use local data
 os.environ["CARTOPY_DATA_DIR"] = NATURAL_EARTH_DIR
 
-STUDY_SITE_LON = -77.696587
-STUDY_SITE_LAT = 34.193111
+STUDY_SITE_LON = -77.79597
+STUDY_SITE_LAT = 34.1671
 
 def add_scale_bar(ax, length_km, location=(0.940, 0.075), linewidth=1, color='black', fontsize=6):
     # Convert length in kilometers to degrees (approximation)
@@ -37,7 +37,7 @@ def set_map_extent(ax, width_in_degrees, height_in_degrees):
 
 def plot_study_site():
     fig, ax = plt.subplots(figsize=(10, 6), subplot_kw={'projection': ccrs.PlateCarree()})
-    ax.set_extent([STUDY_SITE_LON - 5, STUDY_SITE_LON + 5, STUDY_SITE_LAT - 5, STUDY_SITE_LAT + 5])
+    ax.set_extent([STUDY_SITE_LON - 2.5, STUDY_SITE_LON + 2.5, STUDY_SITE_LAT - 2.5, STUDY_SITE_LAT + 2.5])
     
     compass_rose_image = mpimg.imread(COMPASS_ROSE_PATH)
     x0, x1, y0, y1 = ax.get_extent()
@@ -47,7 +47,7 @@ def plot_study_site():
     compass_y = y1 - compass_height * 0.75
     ax.imshow(compass_rose_image, extent=[compass_x - compass_width / 2, compass_x + compass_width / 2, compass_y - compass_height / 2, compass_y + compass_height / 2], transform=ccrs.PlateCarree(), zorder=10)
     
-    add_scale_bar(ax, 100, location=(0.85, 0.05), color='black', fontsize=6)  # Placing the bar at 5% from the left and bottom of the map
+    add_scale_bar(ax, 50, location=(0.85, 0.05), color='black', fontsize=6)  # Placing the bar at 5% from the left and bottom of the map
 
     feature_types = {
         'coastline': 'none',

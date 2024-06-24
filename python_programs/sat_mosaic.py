@@ -14,7 +14,7 @@ import matplotlib.ticker as mticker
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data')
 ACROBAT_DIR = os.path.join(DATA_DIR, 'acrobat', 'transects', 'processed')
-SATELLITE_IMAGES_DIR = os.path.join(DATA_DIR, 'sat_default', 'crops', 'chl')
+SATELLITE_IMAGES_DIR = os.path.join(DATA_DIR, 'sat_default', 'crops', 'unique', 'kd490')
 SAVE_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'maps')
 os.makedirs(SAVE_DIR, exist_ok=True)
 
@@ -27,10 +27,10 @@ TICK_FONT_SIZE = 28
 SCALE_BAR_FONT_SIZE = 20
 
 SUBPLOT_TITLES = [
-    "Chl - MODIS (1000m)",
-    "Chl - HawkEye (120m)",
-    "Chl - S3A-OLCI (300m)",
-    "Chl - S3B-OLCI (300m)"
+    "MODIS (1000m)",
+    "HawkEye (120m)",
+    "S3A-OLCI (300m)",
+    "S3B-OLCI (300m)"
 ]
 
 SAT_IMG_BOUNDS = [34.10, 34.25, -77.85, -77.70]  # [min_lat, max_lat, min_lon, max_lon]
@@ -77,8 +77,8 @@ def main():
     axes = axes.flatten()
 
     # Desired order for images: MODIS, Hawkeye, S3B, S3A
-    #order = [3, 2, 0, 1]  # for kd490
-    order = [0, 1, 3, 2]  # for chlor_a
+    order = [3, 2, 0, 1]  # for kd490
+    #order = [0, 1, 3, 2]  # for chlor_a
     for i, idx in enumerate(order):
         ax = axes[i]
         ax.set_facecolor('#FFFFFF')
@@ -120,8 +120,8 @@ def main():
     for j in range(i + 1, len(axes)):
         axes[j].axis('off')
 
-    plt.subplots_adjust(wspace=0.25, hspace=0.15)
-    plt.savefig(os.path.join(SAVE_DIR, "mosaic_masonboro_chl.png"), dpi=500, bbox_inches='tight')  # Adjusted dpi
+    plt.subplots_adjust(wspace=0.25, hspace=0.50)
+    plt.savefig(os.path.join(SAVE_DIR, "mosaic_masonboro_kd490_unique.png"), dpi=500, bbox_inches='tight')  # Adjusted dpi
     plt.close(fig)
 
 if __name__ == '__main__':

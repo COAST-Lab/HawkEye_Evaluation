@@ -4,6 +4,14 @@ import matplotlib.dates as mdates
 import seaborn as sns
 import os
 
+# Define font size variables
+xlabel_fontsize = 20
+ylabel_fontsize = 20
+title_fontsize = 24
+legend_fontsize = 18
+legend_title_fontsize = 20
+tick_label_fontsize = 18
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 TIDE_DIR = os.path.join(SCRIPT_DIR, 'local_processing_resources', 'meteorological', 'tide', 'CO-OPS_8658163_met_wb.csv')
 SAVE_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'meteorological', 'wb_tides.png')
@@ -16,19 +24,22 @@ tide_data.set_index('DateTime', inplace=True)
 daily_change = tide_data['Verified (m)'].resample('D').agg(['max', 'min'])
 daily_change['change'] = daily_change['max'] - daily_change['min']
 print("Daily Tidal Change:")
-print(daily_change['change'])
+for date, change in daily_change['change'].items():
+    print(f"{date.date()}: {change:.3f} meters")
 
 fig, ax = plt.subplots(figsize=(16, 8))
 ax.plot(tide_data.index, tide_data['Verified (m)'], label='Tide Level (m)', color='#1f77b4')
-ax.set_xlabel('Date, Time', fontsize=14)
-ax.set_ylabel('Height in Meters (MLLW)', fontsize=14)
-ax.set_title('Tide Levels at Wrightsville Beach', fontsize=16)
+ax.set_xlabel('Date, Time', fontsize=xlabel_fontsize)
+ax.set_ylabel('Height in Meters (MLLW)', fontsize=ylabel_fontsize)
+ax.set_title('Tide Levels at Wrightsville Beach', fontsize=title_fontsize)
 ax.grid(True)
 fig.patch.set_facecolor('#FFFFFF')
 ax.set_facecolor('#FFFFFF')
 
 ax.xaxis.set_major_locator(mdates.HourLocator(interval=6))
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M'))
+ax.tick_params(axis='x', labelsize=tick_label_fontsize)
+ax.tick_params(axis='y', labelsize=tick_label_fontsize)
 
 start_date = pd.to_datetime('2023-05-05 06:00')
 end_date = pd.to_datetime('2023-05-08 00:00')
@@ -44,14 +55,14 @@ sentinel3a_time = pd.to_datetime('2023-05-07 15:34:21')
 sentinel3b_time = pd.to_datetime('2023-05-07 14:55:11')
 modis_aqua_time = pd.to_datetime('2023-05-07 18:45:01')
 
-ax.axvline(x=seahawk_time, color='purple', linestyle=':', label='SeaHawk/HawkEye')
-ax.axvline(x=sentinel3a_time, color='red', linestyle='-.', label='Sentinel-3A/OLCI')
-ax.axvline(x=sentinel3b_time, color='green', linestyle='--', label='Sentinel-3B/OLCI')
-ax.axvline(x=modis_aqua_time, color='blue', linestyle='-', label='MODIS/Aqua')
+ax.axvline(x=seahawk_time, color='purple', linestyle=':', label='HawkEye')
+ax.axvline(x=sentinel3a_time, color='red', linestyle='-.', label='S3A-OLCI')
+ax.axvline(x=sentinel3b_time, color='green', linestyle='--', label='S3B-OLCI')
+ax.axvline(x=modis_aqua_time, color='blue', linestyle='-', label='MODISA')
 
 box = ax.get_position()
 ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])  # Shrink width by 20%
-plt.legend(title='Depth Category', loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=False, fontsize=12, title_fontsize=14)
+plt.legend(title='Depth Category', loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=False, fontsize=legend_fontsize, title_fontsize=legend_title_fontsize)
 
 # Adjust the layout and save
 sns.set_context("talk")
