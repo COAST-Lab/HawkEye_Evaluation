@@ -48,7 +48,7 @@ gl.xlabel_style = {'size': 32}
 gl.ylabel_style = {'size': 32}
 
 
-plt.title("R/V Cape Fear, May 5 2023, Masonboro Inlet", fontsize=40)
+plt.title("Masonboro Inlet", fontsize=40)
 
 # Add Compass Rose
 new_ax = fig.add_axes([0.65, 0.75, 0.2, 0.1], anchor='NE', zorder=1)
