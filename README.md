@@ -3,7 +3,7 @@
 ## Introduction
 This project at UNCW evaluates the efficacy of the HawkEye satellite sensor in capturing ocean color (OC) imagery, specifically focusing on the Cape Fear River Estuary (CFRE) in southeastern North Carolina. Coastal and estuarine environments, which are vital for biodiversity and local economies, present unique challenges for remote sensing due to their optically complex waters. This research involves detailed comparisons of in-situ measurements with data from HawkEye and other satellite sensors to refine and enhance marine conservation and management strategies.
 
-![Study Site](assets/img/studysite_mosaic_presentation.jpg)  
+![Study Site](assets/img/studysite_mosaic_presentation.png)  
 *Sampling overview of the Cape Fear River Estuary and Masonboro Inlet Area we collected in-situ water quality measurements with the R/V Cape Fear (transect lines) and where we acquired satellite-derived measurements*
 
 ## Objectives
