@@ -1,10 +1,15 @@
 # Integrating In-Situ Measurements and Satellite Imagery for Coastal Biogeochemical Analysis in the Cape Fear River Estuary
 
-## Introduction
+## Overview
 This project at UNCW evaluates the efficacy of the HawkEye satellite sensor in capturing ocean color (OC) imagery, specifically focusing on the Cape Fear River Estuary (CFRE) in southeastern North Carolina. Coastal and estuarine environments, which are vital for biodiversity and local economies, present unique challenges for remote sensing due to their optically complex waters. This research involves detailed comparisons of in-situ measurements with data from HawkEye and other satellite sensors to refine and enhance marine conservation and management strategies.
 
 ![Study Site](assets/img/studysite_mosaic_presentation.png)  
 *Sampling overview of the Cape Fear River Estuary and Masonboro Inlet Area we collected in-situ water quality measurements with the R/V Cape Fear (transect lines) and where we acquired satellite-derived measurements.*
+
+## Methodology for Data Processing and Analysis
+
+![Methodology Flowchart](assets/img/methods_flowchart.png)  
+*Flowchart of methodologies, beginning with in-situ and satellite-derived data collection, to processing and interpretation, followed by statistical analysis.*
 
 ## Objectives
 1.	**In-Situ Data Collection**: Use the Sea Sciences Acrobat to collect three-dimensional spatial data on conductivity, CDOM, salinity, Chl a, turbidity, dissolved oxygen, density, and temperature.
