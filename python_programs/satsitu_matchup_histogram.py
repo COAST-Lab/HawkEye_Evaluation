@@ -12,9 +12,14 @@ from scipy.stats import gaussian_kde, ttest_rel
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu', 'aggregated_satsitu_data_l2.csv')
-OUTPUT_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu', 'statistics', 'histograms')
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
+VISUAL_SAVE_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'satsitu', 'matchup_histograms')
+if not os.path.exists(VISUAL_SAVE_DIR):
+    os.makedirs(VISUAL_SAVE_DIR)
+
+CSV_SAVE_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu')
+if not os.path.exists(CSV_SAVE_DIR):
+    os.makedirs(CSV_SAVE_DIR)
+
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 df = pd.read_csv(DATA_DIR)
@@ -135,13 +140,13 @@ for sensor_name, (sensor_identifier, date) in sensor_datetime_dict.items():
                 ax.set_ylabel('')
                 ax.tick_params(axis='both', which='major', labelsize=tick_label_font_size)
 
-                plot_filename = os.path.join(OUTPUT_DIR, f"{sensor_name}_{date}_{depth_range_str}_{pixel_size}.png")
+                plot_filename = os.path.join(VISUAL_SAVE_DIR, f"{sensor_name}_{date}_{depth_range_str}_{pixel_size}.png")
                 plt.savefig(plot_filename, dpi=500, bbox_inches='tight')
                 plt.close(f)
             else:
                 print(f"Mismatched data lengths for {sensor_name} {depth_range_str}")
 
 print("All processing complete. Saving results...")
-comprehensive_csv_filename = os.path.join(OUTPUT_DIR, 'comprehensive_stats.csv')
+comprehensive_csv_filename = os.path.join(CSV_SAVE_DIR, 'comprehensive_stats.csv')
 comprehensive_stats_df.to_csv(comprehensive_csv_filename, index=False)
 print("Results saved successfully.")

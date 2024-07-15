@@ -16,7 +16,7 @@ if not os.path.exists(CSV_SAVE_DIR):
     os.makedirs(CSV_SAVE_DIR)
 CSV_SAVE_PATH = os.path.join(CSV_SAVE_DIR, 'oc_params_by_depth.csv')
 
-VISUAL_SAVE_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'depth_distributions')
+VISUAL_SAVE_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'transect_analysis')
 if not os.path.exists(VISUAL_SAVE_DIR):
     os.makedirs(VISUAL_SAVE_DIR)
 
@@ -26,7 +26,7 @@ if not os.path.exists(SAVE_DIR):
 STATS_SAVE_PATH = os.path.join(SAVE_DIR, 'oc_params_stats.csv')
 
 EARTH_RADIUS = 6371  # in kilometers
-INTERPOLATION_METHOD = 'linear'  # Change to 'cubic' or 'nearest' as needed
+INTERPOLATION_METHOD = 'cubic'  # Change to 'cubic' or 'nearest' as needed
 WINDOW_SIZE = 100  # Define the window size for the rolling mean
 SHORE_POINT = (-77.802938, 34.195220)
 
@@ -175,7 +175,7 @@ ax2.set_xticklabels([transect for transect, dist in distances_from_shore])
 ax2.set_xlabel('Transect ID', fontsize=16)
 
 # Save the plot
-plot_path = os.path.join(VISUAL_SAVE_DIR, 'N2_across_transects_with_distance_and_ids_smoothed.png')
+plot_path = os.path.join(VISUAL_SAVE_DIR, 'N2.png')
 plt.savefig(plot_path, dpi=300, bbox_inches='tight')
 
 # Analyze stability
@@ -199,11 +199,11 @@ print(f"Standard deviation of N²: {std_N2:.4e}")
 plt.figure(figsize=(14, 8))
 plt.hist(data['N2_smoothed'], bins=50, color='blue', alpha=0.7)
 plt.axvline(0, color='red', linestyle='--')
-plt.title('Distribution of Buoyancy Frequency Squared (N²) Values (Smoothed)')
+plt.title('Distribution of Buoyancy Frequency Squared (N²) Values')
 plt.xlabel('N² (s⁻²)')
 plt.ylabel('Frequency')
 plt.grid(True)
-hist_plot_path = os.path.join(VISUAL_SAVE_DIR, 'N2_distribution_smoothed.png')
+hist_plot_path = os.path.join(VISUAL_SAVE_DIR, 'N2_distribution.png')
 plt.savefig(hist_plot_path, dpi=300, bbox_inches='tight')
 
 print(f"Histogram of N² values has been saved to {hist_plot_path}")

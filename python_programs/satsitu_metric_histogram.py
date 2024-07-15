@@ -5,8 +5,8 @@ import warnings
 import os
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu', 'statistics', 'comprehensive_stats.csv')
-OUTPUT_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu', 'statistics', 'bar-plots')
+DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data', 'satsitu', 'comprehensive_stats.csv')
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'satsitu', 'metric_histograms')
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 

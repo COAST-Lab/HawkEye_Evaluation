@@ -12,7 +12,7 @@ ACROBAT_DIR = os.path.join(DATA_DIR, 'acrobat', 'transects', 'processed')
 SATELLITE_DIR = os.path.join(DATA_DIR, 'sat_default', 'all_l2')
 
 acrobat_fname = os.path.join(ACROBAT_DIR, 'processed_dataset.csv')
-output_acrobat_fname = os.path.join(DATA_DIR, 'satsitu', 'satsitu_kd490.csv')
+output_acrobat_fname = os.path.join(DATA_DIR, 'satsitu', 'satsitu_l2_kd490.csv')
 OUTPUT_DIR = os.path.dirname(output_acrobat_fname)
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
