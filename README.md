@@ -8,7 +8,7 @@ This project at UNCW evaluates the efficacy of the HawkEye satellite sensor in c
 
 ## Methodology for Data Processing and Analysis
 
-![Methodology Flowchart](assets/img/methods_flowchart.pdf)  
+![Methodology Flowchart](assets/img/methods_flowchart.png)  
 *Flowchart of methodologies, beginning with in-situ and satellite-derived data collection, to processing and interpretation, followed by statistical analysis.*
 
 ## Objectives
