@@ -4,7 +4,7 @@
 This project at UNCW evaluates the efficacy of the HawkEye satellite sensor in capturing ocean color (OC) imagery, specifically focusing on the Cape Fear River Estuary (CFRE) in southeastern North Carolina. Coastal and estuarine environments, which are vital for biodiversity and local economies, present unique challenges for remote sensing due to their optically complex waters. This research involves detailed comparisons of in-situ measurements with data from HawkEye and other satellite sensors to refine and enhance marine conservation and management strategies.
 
 ![Study Site](assets/img/studysite_mosaic_presentation.png)  
-*Sampling overview of the Cape Fear River Estuary and Masonboro Inlet Area we collected in-situ water quality measurements with the R/V Cape Fear (transect lines) and where we acquired satellite-derived measurements*
+*Sampling overview of the Cape Fear River Estuary and Masonboro Inlet Area we collected in-situ water quality measurements with the R/V Cape Fear (transect lines) and where we acquired satellite-derived measurements.*
 
 ## Objectives
 1.	**In-Situ Data Collection**: Use the Sea Sciences Acrobat to collect three-dimensional spatial data on conductivity, CDOM, salinity, Chl a, turbidity, dissolved oxygen, density, and temperature.
@@ -17,7 +17,7 @@ This project at UNCW evaluates the efficacy of the HawkEye satellite sensor in c
 ## Methodology
 Our approach leverages a multi-sensor strategy that combines surface-level satellite imagery with in-situ chlorophyll a measurements collected with the Acrobat, which is capable of vertical water column profiling. Satellite imagery from SeaHawk-HawkEye, Aqua-MODIS, and Sentinel 3A/3B-OLCI were analyzed for overlapping temporal and spatial coverage with field data. This integration allows us to assess the accuracy and utility of satellite sensors in estimating chlorophyll a concentrations in the coastal Cape Fear region, crucial for understanding estuarine primary productivity dynamics.
 
-![Satellite-derived chl mosaic](assets/img/mosaic_masonboro_chl_single.png)  
+![Satellite-derived chl mosaic](assets/img/mosaic_masonboro_chl_single.jpg)  
 *Satellite-derived Chl a concentration in the study region for each sensor type on May 7, 2023. Parallel red lines indicate the path of in-situ data collection. A) Aqua-MODIS, B) SeaHawk-HawkEye, C) S3A-OLCI, D) S3B-OLCI.*
 
 Utilizing a 3D in-situ dataset for satellite matchup analysis enhances satellite analysis since satellite sensors often provide a surface-level perspective, limiting the understanding of vertical variations within water bodies. Our 3D approach captures data across different depths, providing a comprehensive view essential for accurately interpreting satellite imagery. This depth-resolved data enables enhanced calibration and validation of satellite sensors, leading to improved accuracy in mapping and monitoring aquatic environments. The 3D dataset aids in understanding the spatial distribution of water quality parameters and supports the development of models predicting ecological changes within these complex systems.
