@@ -30,7 +30,7 @@ During the study period from May 5 to May 7, we observed variations in environme
 
 The analysis of satellite imagery provided a comprehensive view of the study site. The SeaHawk-HawkEye sensor offered high spatial resolution, revealing detailed patterns in water quality parameters. Our matchup analysis showed notable discrepancies between in-situ and satellite-derived Chl a data, primarily due to differences in sensor resolution, environmental variability, and the temporal gap between data acquisition between in-situ and satellite-derived datasets. Low R-squared scores indicate poor model fit between the sensors, suggesting the water column had significantly changed over the 48-hour window.
 
-![Satellite and In-Situ Matchup Statistical Metric Comparison](assets/img/bar-plots.png)
+![Satellite and In-Situ Matchup Statistical Metric Comparison](assets/img/bar-plots.jpg)
 *Statistical metric comparison across satellite sensor types at different in-situ depth ranges for 1x1 pixel size windows.*
 
 ## Research Findings
