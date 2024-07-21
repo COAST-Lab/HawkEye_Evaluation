@@ -50,6 +50,17 @@ columns = ['Sensor_Name', 'Sensor_File', 'Depth_Range', 'Pixel_Window_Size', 'RM
 comprehensive_stats_df = pd.DataFrame(columns=columns)
 print("Dataframe for storing results initialized.")
 
+# Function to get p-value significance label
+def get_p_value_label(p_value):
+    if p_value < 0.001:
+        return 'p-value < 0.001'
+    elif p_value < 0.01:
+        return 'p-value < 0.01'
+    elif p_value < 0.05:
+        return 'p-value < 0.05'
+    else:
+        return 'p-value > 0.05'
+
 # Loop through each combination of parameters
 for sensor_name, (sensor_identifier, date) in sensor_datetime_dict.items():
     for pixel_size in pixel_window_sizes:
@@ -127,14 +138,15 @@ for sensor_name, (sensor_identifier, date) in sensor_datetime_dict.items():
                 # Regression model
                 x_range = np.linspace(true_values.min(), true_values.max(), 100)
                 y_range = polyreg.predict(x_range.reshape(-1, 1))
-                sns.lineplot(x=x_range, y=y_range, color='orange', linewidth=2, ax=ax)
+                sns.lineplot(x=x_range, y=y_range, color='red', linewidth=2, ax=ax)
+                ax.plot(x_range, x_range, color='black', linestyle='--', linewidth=2)
 
                 # Adding annotations for the metrics
-                ax.annotate(f'N: {len(true_values)}\np-value: {p_value:.4f}',
-                            xy=(0.97, 0.95), xycoords='axes fraction',
-                            horizontalalignment='right', verticalalignment='top',
-                            bbox=dict(boxstyle='round,pad=0.5', fc='#FFFFFF', alpha=0.5),
-                            fontsize=annotation_font_size)  # Increase font size for annotation
+                #ax.annotate(f'N: {len(true_values)}\np-value: {p_value:.4f}',
+                #            xy=(0.97, 0.95), xycoords='axes fraction',
+                #            horizontalalignment='right', verticalalignment='top',
+                #            bbox=dict(boxstyle='round,pad=0.5', fc='#FFFFFF', alpha=0.5),
+                #            fontsize=annotation_font_size)  # Increase font size for annotation
 
                 ax.set_xlabel('')
                 ax.set_ylabel('')

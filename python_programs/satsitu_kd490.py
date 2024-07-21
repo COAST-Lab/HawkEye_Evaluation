@@ -9,7 +9,7 @@ import warnings
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data')
 ACROBAT_DIR = os.path.join(DATA_DIR, 'acrobat', 'transects', 'processed')
-SATELLITE_DIR = os.path.join(DATA_DIR, 'sat_default', 'all_l2')
+SATELLITE_DIR = os.path.join(DATA_DIR, 'satellite', 'all_l2')
 
 acrobat_fname = os.path.join(ACROBAT_DIR, 'processed_dataset.csv')
 output_acrobat_fname = os.path.join(DATA_DIR, 'satsitu', 'satsitu_l2_kd490.csv')

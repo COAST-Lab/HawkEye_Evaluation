@@ -24,7 +24,6 @@ depth_ranges = [(0, 4), (4, 7), (7, 10), (0, 10)]
 warnings.filterwarnings('ignore', category=RuntimeWarning)
 warnings.filterwarnings('ignore', category=PerformanceWarning)
 
-
 def apply_sliding_window_aggregation(data, window_size):
     if window_size == 1:
         return data
@@ -90,3 +89,5 @@ for sensor_identifier in sensor_identifiers:
 
 df.to_csv(output_filename, index=False)
 print("Processing completed.")
+
+

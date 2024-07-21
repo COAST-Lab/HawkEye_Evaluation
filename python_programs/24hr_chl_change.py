@@ -20,8 +20,8 @@ OUTPUT_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'maps')
 OUTPUT_FILE = 'sat_chlor_comparison.png'
 OUTPUT_PATH = os.path.join(OUTPUT_DIR, OUTPUT_FILE)
 
-S3A_FILE_PATH = os.path.join(DATA_DIR, 'sat_default', 's3a', 'l2-l3', 'daily', '300m-chlor_a', 'mean', 'S3A_OLCI_EFRNT.2023050720230507.DLY.chlor_a.map.nc')
-S3B_FILE_PATH = os.path.join(DATA_DIR, 'sat_default', 's3b', 'l2-l3', 'daily', '300m-chlor_a', 'mean', 'S3B_OLCI_EFRNT.2023050620230506.DLY.chlor_a.map.nc')
+S3A_FILE_PATH = os.path.join(DATA_DIR, 'satellite', 's3a', 'l2-l3', 'daily', '300m-chlor_a', 'mean', 'S3A_OLCI_EFRNT.2023050720230507.DLY.chlor_a.map.nc')
+S3B_FILE_PATH = os.path.join(DATA_DIR, 'satellite', 's3b', 'l2-l3', 'daily', '300m-chlor_a', 'mean', 'S3B_OLCI_EFRNT.2023050620230506.DLY.chlor_a.map.nc')
 
 def load_chlor_a_data(file_path):
     # Load chlorophyll-a data from a given NetCDF file.

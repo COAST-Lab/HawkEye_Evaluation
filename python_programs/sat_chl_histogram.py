@@ -12,7 +12,7 @@ plt.rc('legend', fontsize=18)     # Legend font size
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, '..', '..', 'data')
-SATELLITE_DATA_DIR = os.path.join(DATA_DIR, 'sat_default', 'chl_stats')
+SATELLITE_DATA_DIR = os.path.join(DATA_DIR, 'satellite', 'chl_stats')
 SAVE_DIR = os.path.join(SCRIPT_DIR, '..', 'visualization', 'satellite')
 if not os.path.exists(SAVE_DIR):
     os.makedirs(SAVE_DIR)
